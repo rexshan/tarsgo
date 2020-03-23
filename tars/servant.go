@@ -165,19 +165,18 @@ func (s *ServantProxy)ProxyInvoke(ctx context.Context, cType byte, sFuncName str
 type ServantProxyFactory struct {
 	objs map[string]*ServantProxy
 	comm *Communicator
-	fm   *sync.Mutex
+	fm   *sync.RWMutex
 }
 
 func NewServantProxyFactory(comm *Communicator) *ServantProxyFactory {
-	return &ServantProxyFactory{
-		comm: comm,
-		objs: make(map[string]*ServantProxy),
-	}
+	f := &ServantProxyFactory{}
+	f.Init(comm)
+	return f
 }
 
 //Init init the  ServantProxyFactory.
 func (o *ServantProxyFactory) Init(comm *Communicator) {
-	o.fm = new(sync.Mutex)
+	o.fm = new(sync.RWMutex)
 	o.comm = comm
 	o.objs = make(map[string]*ServantProxy)
 }
