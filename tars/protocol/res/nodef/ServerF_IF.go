@@ -6,11 +6,11 @@ package nodef
 import (
 	"context"
 	"fmt"
-	m "gitee.com/bee-circle/tarsgo/tars/model"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/codec"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
-	"gitee.com/bee-circle/tarsgo/tars/util/current"
-	"gitee.com/bee-circle/tarsgo/tars/util/tools"
+	m "github.com/rexshan/tarsgo/tars/model"
+	"github.com/rexshan/tarsgo/tars/protocol/codec"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars/util/current"
+	"github.com/rexshan/tarsgo/tars/util/tools"
 )
 
 //ServerF struct

@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/util/rogger"
-	"gitee.com/bee-circle/tarsgo/tars/util/rtimer"
+	"github.com/rexshan/tarsgo/tars/util/rogger"
+	"github.com/rexshan/tarsgo/tars/util/rtimer"
 )
 
 const (

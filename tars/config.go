@@ -1,7 +1,7 @@
 package tars
 
 import (
-	"gitee.com/bee-circle/tarsgo/tars/util/endpoint"
+	"github.com/rexshan/tarsgo/tars/util/endpoint"
 )
 
 var svrCfg *serverConfig

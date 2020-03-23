@@ -5,10 +5,10 @@ import (
 	"sync"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/endpointf"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/queryf"
-	"gitee.com/bee-circle/tarsgo/tars/util/endpoint"
-	"gitee.com/bee-circle/tarsgo/tars/util/set"
+	"github.com/rexshan/tarsgo/tars/protocol/res/endpointf"
+	"github.com/rexshan/tarsgo/tars/protocol/res/queryf"
+	"github.com/rexshan/tarsgo/tars/util/endpoint"
+	"github.com/rexshan/tarsgo/tars/util/set"
 )
 
 // EndpointManager is a struct which contains endpoint information.

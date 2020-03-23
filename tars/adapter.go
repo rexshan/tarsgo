@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"gitee.com/bee-circle/tarsgo/tars/util/tools"
+	"github.com/rexshan/tarsgo/tars/util/tools"
 	"net"
 	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/codec"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/endpointf"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
-	"gitee.com/bee-circle/tarsgo/tars/transport"
+	"github.com/rexshan/tarsgo/tars/protocol/codec"
+	"github.com/rexshan/tarsgo/tars/protocol/res/endpointf"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars/transport"
 )
 
 // AdapterProxy : Adapter proxy

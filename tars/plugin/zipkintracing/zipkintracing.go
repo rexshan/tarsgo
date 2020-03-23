@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	oplog "github.com/opentracing/opentracing-go/log"

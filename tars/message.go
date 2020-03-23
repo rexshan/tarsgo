@@ -3,7 +3,7 @@ package tars
 import (
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
 )
 
 // Message is a struct contains servant information

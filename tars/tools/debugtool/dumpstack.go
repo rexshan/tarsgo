@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"gitee.com/bee-circle/tarsgo/tars"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/adminf"
+	"github.com/rexshan/tarsgo/tars"
+	"github.com/rexshan/tarsgo/tars/protocol/res/adminf"
 )
 
 func main() {

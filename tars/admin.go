@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	debugutil "gitee.com/bee-circle/tarsgo/tars/util/debug"
-	logger "gitee.com/bee-circle/tarsgo/tars/util/rogger"
+	debugutil "github.com/rexshan/tarsgo/tars/util/debug"
+	logger "github.com/rexshan/tarsgo/tars/util/rogger"
 )
 
 //Admin struct

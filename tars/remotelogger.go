@@ -3,7 +3,7 @@ package tars
 import (
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/logf"
+	"github.com/rexshan/tarsgo/tars/protocol/res/logf"
 )
 
 //RemoteTimeWriter writer for writing remote log.

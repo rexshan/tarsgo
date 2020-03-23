@@ -5,7 +5,7 @@ package nodef
 
 import (
 	"fmt"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/codec"
+	"github.com/rexshan/tarsgo/tars/protocol/codec"
 )
 
 //ServerInfo strcut implement

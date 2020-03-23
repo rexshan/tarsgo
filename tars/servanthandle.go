@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gitee.com/bee-circle/tarsgo/tars/transport"
+	"github.com/rexshan/tarsgo/tars/transport"
 )
 
 //AddServant add dispatch and interface for object.

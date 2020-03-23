@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/transport"
+	"github.com/rexshan/tarsgo/tars/transport"
 )
 
 //MyClient is a example client for tars client testing.

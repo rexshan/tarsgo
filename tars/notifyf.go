@@ -1,6 +1,6 @@
 package tars
 
-import "gitee.com/bee-circle/tarsgo/tars/protocol/res/notifyf"
+import "github.com/rexshan/tarsgo/tars/protocol/res/notifyf"
 
 //NotifyHelper is the helper struct for the Notify service.
 type NotifyHelper struct {

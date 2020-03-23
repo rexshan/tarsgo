@@ -3,7 +3,7 @@ package model
 import (
 	"context"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
 )
 
 //Servant is interface for call the remote server.

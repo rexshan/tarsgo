@@ -82,7 +82,7 @@ else
 fi
 
 # try build tars2go
-cd "$GOPATH/src/gitee.com/bee-circle/tarsgo/tars/tools/tars2go"
+cd "$GOPATH/src/github.com/rexshan/tarsgo/tars/tools/tars2go"
 go install
 cd "$GOPATH/src/$APP/$SERVER"
 echo ">>> Great！Done! You can jump in "`pwd`

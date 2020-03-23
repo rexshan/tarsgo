@@ -5,7 +5,7 @@ package statf
 
 import (
 	"fmt"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/codec"
+	"github.com/rexshan/tarsgo/tars/protocol/codec"
 )
 
 //StatMicMsgHead strcut implement

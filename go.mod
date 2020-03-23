@@ -1,4 +1,4 @@
-module gitee.com/bee-circle/tarsgo
+module github.com/rexshan/tarsgo
 
 go 1.14
 

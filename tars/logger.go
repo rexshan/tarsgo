@@ -3,7 +3,7 @@ package tars
 import (
 	"path/filepath"
 
-	"gitee.com/bee-circle/tarsgo/tars/util/rogger"
+	"github.com/rexshan/tarsgo/tars/util/rogger"
 )
 
 // GetLogger Get a logger

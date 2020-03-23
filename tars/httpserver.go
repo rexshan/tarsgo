@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/statf"
+	"github.com/rexshan/tarsgo/tars/protocol/res/statf"
 )
 
 var realIPHeader []string

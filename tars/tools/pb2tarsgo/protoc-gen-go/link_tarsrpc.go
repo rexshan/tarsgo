@@ -31,4 +31,4 @@
 
 package main
 
-import _ "gitee.com/bee-circle/tarsgo/tars/tools/pb2tarsgo/protoc-gen-go/tarsrpc"
+import _ "github.com/rexshan/tarsgo/tars/tools/pb2tarsgo/protoc-gen-go/tarsrpc"

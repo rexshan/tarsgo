@@ -1,6 +1,6 @@
 package endpoint
 
-import "gitee.com/bee-circle/tarsgo/tars/protocol/res/endpointf"
+import "github.com/rexshan/tarsgo/tars/protocol/res/endpointf"
 
 //Tars2endpoint make endpointf.EndpointF to Endpoint struct.
 func Tars2endpoint(end endpointf.EndpointF) Endpoint {

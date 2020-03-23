@@ -10,12 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/adminf"
-	"gitee.com/bee-circle/tarsgo/tars/transport"
-	"gitee.com/bee-circle/tarsgo/tars/util/conf"
-	"gitee.com/bee-circle/tarsgo/tars/util/endpoint"
-	"gitee.com/bee-circle/tarsgo/tars/util/rogger"
-	"gitee.com/bee-circle/tarsgo/tars/util/tools"
+	"github.com/rexshan/tarsgo/tars/protocol/res/adminf"
+	"github.com/rexshan/tarsgo/tars/transport"
+	"github.com/rexshan/tarsgo/tars/util/conf"
+	"github.com/rexshan/tarsgo/tars/util/endpoint"
+	"github.com/rexshan/tarsgo/tars/util/rogger"
+	"github.com/rexshan/tarsgo/tars/util/tools"
 )
 
 var tarsConfig map[string]*transport.TarsServerConf

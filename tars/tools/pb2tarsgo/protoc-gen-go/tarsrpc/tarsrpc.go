@@ -45,10 +45,10 @@ import (
 // Paths for packages used by code generated in this file,
 // relative to the import_prefix of the generator.Generator.
 const (
-	modelPkgPath   = "gitee.com/bee-circle/tarsgo/tars/model"
-	requestPkgPath = "gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
-	tarsPkgPath    = "gitee.com/bee-circle/tarsgo/tars"
-	toolsPath      = "gitee.com/bee-circle/tarsgo/tars/util/tools"
+	modelPkgPath   = "github.com/rexshan/tarsgo/tars/model"
+	requestPkgPath = "github.com/rexshan/tarsgo/tars/protocol/res/requestf"
+	tarsPkgPath    = "github.com/rexshan/tarsgo/tars"
+	toolsPath      = "github.com/rexshan/tarsgo/tars/util/tools"
 )
 
 func init() {

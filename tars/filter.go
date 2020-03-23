@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
 )
 
 type filters struct {

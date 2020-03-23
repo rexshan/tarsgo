@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/transport"
+	"github.com/rexshan/tarsgo/tars/transport"
 )
 
 //MyServer struct for testing tars tcp server

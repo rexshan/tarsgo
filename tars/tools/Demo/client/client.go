@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"gitee.com/bee-circle/tarsgo/tars"
+	"github.com/rexshan/tarsgo/tars"
 
 	"_APP_"
 )

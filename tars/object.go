@@ -8,9 +8,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/basef"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
-	"gitee.com/bee-circle/tarsgo/tars/util/rtimer"
+	"github.com/rexshan/tarsgo/tars/protocol/res/basef"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars/util/rtimer"
 )
 
 // ObjectProxy is struct contains proxy information

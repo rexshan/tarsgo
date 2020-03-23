@@ -8,9 +8,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/basef"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
-	"gitee.com/bee-circle/tarsgo/tars/util/tools"
+	"github.com/rexshan/tarsgo/tars/protocol/res/basef"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars/util/tools"
 )
 
 //ServantProxy is the struct for proxy servants.

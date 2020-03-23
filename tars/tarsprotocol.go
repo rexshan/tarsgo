@@ -6,11 +6,11 @@ import (
 	"encoding/binary"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/util/current"
+	"github.com/rexshan/tarsgo/tars/util/current"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/codec"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/basef"
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/requestf"
+	"github.com/rexshan/tarsgo/tars/protocol/codec"
+	"github.com/rexshan/tarsgo/tars/protocol/res/basef"
+	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
 )
 
 type dispatch interface {

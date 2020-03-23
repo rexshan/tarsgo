@@ -3,7 +3,7 @@ package tars
 import (
 	"sync"
 
-	s "gitee.com/bee-circle/tarsgo/tars/model"
+	s "github.com/rexshan/tarsgo/tars/model"
 )
 
 // ProxyPrx interface

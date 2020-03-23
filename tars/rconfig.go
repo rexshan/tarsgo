@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/configf"
+	"github.com/rexshan/tarsgo/tars/protocol/res/configf"
 )
 
 func saveFile(path string, filename string, content string) error {

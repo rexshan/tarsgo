@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"gitee.com/bee-circle/tarsgo/tars/protocol/res/propertyf"
-	"gitee.com/bee-circle/tarsgo/tars/util/tools"
+	"github.com/rexshan/tarsgo/tars/protocol/res/propertyf"
+	"github.com/rexshan/tarsgo/tars/util/tools"
 )
 
 //ReportMethod is the interface for all kinds of report methods.
