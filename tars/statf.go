@@ -117,15 +117,14 @@ func (s *StatFHelper) ReportMicMsg(stStatInfo StatInfo, fromServer bool) {
 var StatReport *StatFHelper
 var statInited = make(chan struct{}, 1)
 
-func initReport() {
+func initReport(comm *Communicator,stat string) {
 	if GetClientConfig() == nil {
 		statInited <- struct{}{}
 		return
 	}
-	comm := NewCommunicator()
 	comm.SetProperty("netthread", 1)
 	StatReport = new(StatFHelper)
-	StatReport.Init(comm, GetClientConfig().stat)
+	StatReport.Init(comm, stat)
 	statInited <- struct{}{}
 	go StatReport.Run()
 }

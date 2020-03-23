@@ -152,7 +152,15 @@ func initConfig() {
 
 	tarsConfig["AdminObj"] = adminCfg
 	svrCfg.Adapters["AdminAdapter"] = adapterConfig{localpoint, "tcp", "AdminObj", 1}
-	go initReport()
+	comm := startFrameWorkComm()
+	initFrameWorkClient(comm)
+}
+
+func initFrameWorkClient(c *Communicator) {
+	if cc := GetClientConfig(); cc != nil {
+		initReport(c, cc.stat)
+	}
+	return
 }
 
 //Run the application
@@ -198,13 +206,10 @@ func Run() {
 
 func mainloop() {
 	ha := new(NodeFHelper)
-	comm := NewCommunicator()
-	//comm.SetProperty("netthread", 1)
 	node := GetServerConfig().Node
 	app := GetServerConfig().App
 	server := GetServerConfig().Server
-	//container := GetServerConfig().Container
-	ha.SetNodeInfo(comm, node, app, server)
+	ha.SetNodeInfo(startFrameWorkComm(), node, app, server)
 
 	go ha.ReportVersion(GetServerConfig().Version)
 	go ha.KeepAlive("") //first start
