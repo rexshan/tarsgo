@@ -26,7 +26,7 @@ func AddServantWithContext(v dispatch, f interface{}, obj string) {
 		TLOG.Debugf("not found fullname: %s %+v", obj,err)
 		return
 	}
-	addServantCommon(v, f, obj, true)
+	addServantCommon(v, fullobjname, obj, true)
 }
 
 func addServantCommon(v dispatch, f interface{}, obj string, withContext bool) {
