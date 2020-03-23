@@ -104,7 +104,7 @@ func (c *AdapterProxy) Recv(pkg []byte) {
 		TLOG.Error("decode packet error", err.Error())
 		return
 	}
-	fmt.Println(fmt.Sprintf("look -------------------------------%d",c.sendCount))
+	fmt.Println(fmt.Sprintf("look -------------------------------%s",c.point.Host))
 	chIF, ok := c.resp.Load(packet.IRequestId)
 	if ok {
 		fmt.Println("-------------------------------22")
