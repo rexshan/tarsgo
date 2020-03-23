@@ -145,6 +145,7 @@ func (c *connection) recv(conn net.Conn) {
 			if _, ok := err.(*net.OpError); ok {
 				TLOG.Error("netOperror", conn.RemoteAddr())
 				c.close(conn)
+				fmt.Println("-------msg12222")
 				return // connection is closed
 			}
 			if err == io.EOF {
@@ -153,6 +154,7 @@ func (c *connection) recv(conn net.Conn) {
 				TLOG.Error("read package error:", err)
 			}
 			c.close(conn)
+			fmt.Println("-------msg1")
 			return
 		}
 		currBuffer = append(currBuffer, buffer[:n]...)
@@ -180,6 +182,7 @@ func (c *connection) recv(conn net.Conn) {
 			}
 			TLOG.Error("parse package error")
 			c.close(conn)
+			fmt.Println("-------msg122223232")
 			return
 		}
 	}
