@@ -51,14 +51,20 @@ func (s *ServantProxy) TarsSetHashCode(code int64) {
 }
 
 //Tars_invoke is use for client inoking server.
-func (s *ServantProxy) TarsInvoke(ctx context.Context, ctype byte,
+func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	sFuncName string,
-	buf []byte,
+	buf []byte,status map[string]string,
+	reqContext map[string]string,
 	Resp *requestf.ResponsePacket) error {
+	var sndCtx map[string]string
 	defer checkPanic()
 	//TODO 重置sid，防止溢出
 	atomic.CompareAndSwapInt32(&s.sid, 1<<31-1, 1)
-	ctxMap,_ := FromOutgoingContext(ctx)
+	if ctxMap,ok := FromOutgoingContext(ctx);ok {
+		sndCtx = ctxMap
+	}else {
+		sndCtx = reqContext
+	}
 	req := requestf.RequestPacket{
 		IVersion:     1,
 		CPacketType:  0,
@@ -67,8 +73,8 @@ func (s *ServantProxy) TarsInvoke(ctx context.Context, ctype byte,
 		SFuncName:    sFuncName,
 		SBuffer:      tools.ByteToInt8(buf),
 		ITimeout:     ReqDefaultTimeout,
-		Context:      ctxMap,
-//		Status:       status,
+		Context:      sndCtx,
+		Status:       status,
 	}
 	msg := &Message{Req: &req, Ser: s, Obj: s.obj}
 	msg.Init()
