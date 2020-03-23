@@ -32,8 +32,8 @@ copyfile = if test -z "$(APP)" || test -z "$(TARGET)"; then \
 
 ALL: $(TARGET)
 #----------------------------------------------------------------------------------
-$(TARGET): TARSBUILD $(GO_SRC)
-	$(GO) build $(GO_BUILD_FLAG) -o $@
+$(TARGET): $(GO_SRC)
+	GOOS=linux $(GO) build $(GO_BUILD_FLAG) -o $@
 #----------------------------------------------------------------------------------
 TARSBUILD: $(TARS_SRC)
 	$(TARS2GO) $(J2GO_FLAG) $(TARS_SRC)
