@@ -163,7 +163,7 @@ func Run() {
 	// add adminF
 	adf := new(adminf.AdminF)
 	ad := new(Admin)
-	AddServant(adf, ad, "AdminObj")
+	addServantCommon(adf, ad, "AdminObj",false)
 
 	for _, obj := range objRunList {
 		if s, ok := httpSvrs[obj]; ok {
