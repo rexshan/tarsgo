@@ -16,6 +16,6 @@ type Servant interface {
 		Resp *requestf.ResponsePacket) error
 
 	TarsSetTimeout(t int)
-	GetProxyEndPoints(ctx context.Context,cType byte,sFuncName string,buf []byte)(map[string]*requestf.ResponsePacket,map[string]error)
+	GetProxyEndPoints()[]string
 	ProxyInvoke(ctx context.Context, cType byte, sFuncName string, buf []byte, ipPort string,Resp *requestf.ResponsePacket) error
 }
