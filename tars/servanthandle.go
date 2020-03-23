@@ -11,11 +11,21 @@ import (
 
 //AddServant add dispatch and interface for object.
 func AddServant(v dispatch, f interface{}, obj string) {
-	addServantCommon(v, f, obj, true)
+	fullobjname,err := fullObjName(obj)
+	if err != nil {
+		TLOG.Debugf("not found fullname: %s %+v", obj,err)
+		return
+	}
+	addServantCommon(v, f, fullobjname, true)
 }
 
 //AddServantWithContext add dispatch and interface for object, which have ctx,context
 func AddServantWithContext(v dispatch, f interface{}, obj string) {
+	fullobjname,err := fullObjName(obj)
+	if err != nil {
+		TLOG.Debugf("not found fullname: %s %+v", obj,err)
+		return
+	}
 	addServantCommon(v, f, obj, true)
 }
 

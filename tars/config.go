@@ -1,7 +1,9 @@
 package tars
 
 import (
+	"errors"
 	"github.com/rexshan/tarsgo/tars/util/endpoint"
+	"strings"
 )
 
 var svrCfg *serverConfig
@@ -59,4 +61,25 @@ type clientConfig struct {
 	refreshEndpointInterval int
 	reportInterval          int
 	AsyncInvokeTimeout      int
+}
+
+func fullObjName(obj string)(string,error) {
+	var fullObjName string
+	pos := strings.Index(obj, ".")
+	if pos > 0 {
+		fullObjName =  obj
+	} else {
+		switch {
+		case GetServerConfig() == nil:
+			return fullObjName, errors.New("nil server config")
+		case GetServerConfig().App == "" || GetServerConfig().Server == "":
+			return fullObjName,errors.New("empty app or server name")
+		}
+		fullObjName = strings.Join([]string{
+			GetServerConfig().App,
+			GetServerConfig().Server,
+			obj,
+		}, ".")
+	}
+	return fullObjName,nil
 }
