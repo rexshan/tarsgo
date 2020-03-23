@@ -2,6 +2,7 @@ package transport
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"sync"
@@ -157,6 +158,7 @@ func (c *connection) recv(conn net.Conn) {
 		currBuffer = append(currBuffer, buffer[:n]...)
 		for {
 			pkgLen, status := c.tc.cp.ParsePackage(currBuffer)
+			fmt.Println(fmt.Sprintf("-------msg :%d",pkgLen))
 			if status == PACKAGE_LESS {
 				break
 			}
@@ -165,7 +167,11 @@ func (c *connection) recv(conn net.Conn) {
 				pkg := make([]byte, pkgLen-4)
 				copy(pkg, currBuffer[4:pkgLen])
 				currBuffer = currBuffer[pkgLen:]
+
+				fmt.Println(fmt.Sprintf("-------msg222 :%d",pkgLen))
+
 				go c.tc.cp.Recv(pkg)
+
 				if len(currBuffer) > 0 {
 					continue
 				}
