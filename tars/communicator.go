@@ -121,4 +121,7 @@ func (c *Communicator) GetPropertyBool(key string) (bool, bool) {
 	return false, false
 }
 
+func (c *Communicator) GetServantProxy(objName string) *ServantProxy {
+	return c.s.GetServantProxy(objName)
+}
 
