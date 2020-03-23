@@ -168,6 +168,13 @@ type ServantProxyFactory struct {
 	fm   *sync.Mutex
 }
 
+func NewServantProxyFactory(comm *Communicator) *ServantProxyFactory {
+	return &ServantProxyFactory{
+		comm: comm,
+		objs: make(map[string]*ServantProxy),
+	}
+}
+
 //Init init the  ServantProxyFactory.
 func (o *ServantProxyFactory) Init(comm *Communicator) {
 	o.fm = new(sync.Mutex)

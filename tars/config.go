@@ -54,6 +54,7 @@ type clientConfig struct {
 	Locator                 string
 	stat                    string
 	property                string
+	netconnectionnum        int
 	modulename              string
 	refreshEndpointInterval int
 	reportInterval          int

@@ -11,6 +11,8 @@ type ProxyPrx interface {
 	SetServant(s.Servant)
 }
 
+
+
 // Dail returns servant proxy
 func Dail(servant string) *ServantProxy {
 	c := new(Communicator)
@@ -43,6 +45,7 @@ func (c *Communicator) init() {
 			"",
 			"",
 			"",
+			1,
 			"",
 			refreshEndpointInterval,
 			reportInterval,
@@ -117,3 +120,5 @@ func (c *Communicator) GetPropertyBool(key string) (bool, bool) {
 	}
 	return false, false
 }
+
+
