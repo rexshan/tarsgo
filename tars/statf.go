@@ -122,10 +122,13 @@ func initReport(comm *Communicator,stat string) {
 		statInited <- struct{}{}
 		return
 	}
+	TLOG.Debug("config add111222 ")
 	comm.SetProperty("netthread", 1)
 	StatReport = new(StatFHelper)
 	StatReport.Init(comm, stat)
+	TLOG.Debug("config add11133333 ")
 	statInited <- struct{}{}
+	TLOG.Debug("config add11144444 ")
 	go StatReport.Run()
 }
 

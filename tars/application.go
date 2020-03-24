@@ -167,7 +167,7 @@ func initFrameWorkClient(c *Communicator) {
 func Run() {
 	Init()
 	<-statInited
-
+	TLOG.Debug("config add111 ")
 	// add adminF
 	adf := new(adminf.AdminF)
 	ad := new(Admin)
