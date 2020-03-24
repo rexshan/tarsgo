@@ -6,6 +6,7 @@ package nodef
 import (
 	"context"
 	"fmt"
+	"github.com/rexshan/tarsgo/tars"
 	m "github.com/rexshan/tarsgo/tars/model"
 	"github.com/rexshan/tarsgo/tars/protocol/codec"
 	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
@@ -42,8 +43,10 @@ func (_obj *ServerF) KeepAlive(ServerInfo *ServerInfo, _opt ...map[string]string
 	ctx := context.Background()
 	err = _obj.s.Tars_invoke(ctx, 0, "keepAlive", _os.ToBytes(), _status, _context, _resp)
 	if err != nil {
+		tars.TLOG.Debug("keepAlive add111 fail : ",err)
 		return ret, err
 	}
+	tars.TLOG.Debug("keepAlive add111 succ")
 	_is := codec.NewReader(tools.Int8ToByte(_resp.SBuffer))
 	err = _is.Read_int32(&ret, 0, true)
 	if err != nil {

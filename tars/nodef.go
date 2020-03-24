@@ -18,6 +18,7 @@ func (n *NodeFHelper) SetNodeInfo(comm *Communicator, node string, app string, s
 	n.comm = comm
 	n.sf = new(nodef.ServerF)
 	n.sf.SetServant(comm.GetServantProxy(node))
+	n.sf.TarsSetTimeout(15000)
 	n.si = nodef.ServerInfo{
 		app,
 		server,
