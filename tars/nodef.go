@@ -17,7 +17,7 @@ type NodeFHelper struct {
 func (n *NodeFHelper) SetNodeInfo(comm *Communicator, node string, app string, server string) {
 	n.comm = comm
 	n.sf = new(nodef.ServerF)
-	comm.StringToProxy(node, n.sf)
+	n.sf.SetServant(comm.GetServantProxy(node))
 	n.si = nodef.ServerInfo{
 		app,
 		server,
