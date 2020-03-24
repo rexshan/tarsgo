@@ -45,13 +45,13 @@ func (_obj *ServerF) KeepAlive(ServerInfo *ServerInfo, _opt ...map[string]string
 		fmt.Println("keepAlive add111 fail : ",err)
 		return ret, err
 	}
-	fmt.Println("keepAlive add111 succ")
+
 	_is := codec.NewReader(tools.Int8ToByte(_resp.SBuffer))
 	err = _is.Read_int32(&ret, 0, true)
 	if err != nil {
 		return ret, err
 	}
-
+	fmt.Println("keepAlive add111 succ")
 	setMap(len(_opt), _resp, _context, _status)
 	_ = length
 	_ = have

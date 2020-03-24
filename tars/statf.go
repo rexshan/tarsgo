@@ -37,7 +37,8 @@ func (s *StatFHelper) Init(comm *Communicator, node string) {
 	s.mStatInfo = make(map[statf.StatMicMsgHead]statf.StatMicMsgBody)
 	s.comm = comm
 	s.sf = new(statf.StatF)
-	s.comm.StringToProxy(s.node, s.sf)
+	s.sf.SetServant(s.comm.GetServantProxy(s.node))
+	s.sf.TarsSetTimeout(1500)
 }
 
 func (s *StatFHelper) addUpMsg(statList *list.List, fromServer bool) {
