@@ -152,8 +152,6 @@ func initConfig() {
 
 	tarsConfig["AdminObj"] = adminCfg
 	svrCfg.Adapters["AdminAdapter"] = adapterConfig{localpoint, "tcp", "AdminObj", 1}
-	comm := startFrameWorkComm()
-	initFrameWorkClient(comm)
 }
 
 func initFrameWorkClient(c *Communicator) {
@@ -166,6 +164,10 @@ func initFrameWorkClient(c *Communicator) {
 //Run the application
 func Run() {
 	Init()
+	TLOG.Debug("Run the application ")
+	comm := startFrameWorkComm()
+	initFrameWorkClient(comm)
+	TLOG.Debug("config add111999999999 ")
 	<-statInited
 	TLOG.Debug("config add111 ")
 	// add adminF
