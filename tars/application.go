@@ -158,7 +158,7 @@ func initConfig() {
 
 func initFrameWorkClient(c *Communicator) {
 	if cc := GetClientConfig(); cc != nil {
-		initReport(c, cc.stat)
+		go initReport(c, cc.stat)
 	}
 	return
 }
