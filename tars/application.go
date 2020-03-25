@@ -31,7 +31,10 @@ var initOnce sync.Once
 
 type adminFn func(string) (string, error)
 
-var adminMethods map[string]adminFn
+var (
+	adminMethods map[string]adminFn
+	ConfPath *string
+)
 
 func init() {
 	tarsConfig = make(map[string]*transport.TarsServerConf)
@@ -50,12 +53,12 @@ func Init() {
 }
 
 func initConfig() {
-	confPath := flag.String("config", "", "init config path")
+	ConfPath = flag.String("config", "", "init config path")
 	flag.Parse()
-	if len(*confPath) == 0 {
+	if len(*ConfPath) == 0 {
 		return
 	}
-	c, err := conf.NewConf(*confPath)
+	c, err := conf.NewConf(*ConfPath)
 	if err != nil {
 		TLOG.Error("open app config fail")
 	}
