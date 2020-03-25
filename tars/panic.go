@@ -18,3 +18,9 @@ func checkPanic() {
 		os.Exit(-1)
 	}
 }
+
+func CheckGoPanic() {
+	if r := recover(); r != nil {
+		TLOG.Errorf("painc :%s",string(debug.Stack()))
+	}
+}
