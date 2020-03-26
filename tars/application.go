@@ -181,10 +181,10 @@ func Run() {
 	for _, obj := range objRunList {
 		if s, ok := httpSvrs[obj]; ok {
 			go func(obj string) {
-				fmt.Println(obj, "http server start")
+				TLOG.Info(obj, "http server start")
 				err := s.ListenAndServe()
 				if err != nil {
-					fmt.Println(obj, "server start failed", err)
+					TLOG.Info(obj, "server start failed", err)
 					os.Exit(1)
 				}
 			}(obj)
