@@ -100,19 +100,15 @@ func (c *AdapterProxy) Recv(pkg []byte) {
 	packet := requestf.ResponsePacket{}
 	err := packet.ReadFrom(codec.NewReader(pkg))
 	if err != nil {
-		fmt.Println("-------------------------------2")
 		TLOG.Error("decode packet error", err.Error())
 		return
 	}
-	fmt.Println(fmt.Sprintf("look -------------------------------%s",c.point.Host))
 	chIF, ok := c.resp.Load(packet.IRequestId)
 	if ok {
-		fmt.Println("-------------------------------22")
 		ch := chIF.(chan *requestf.ResponsePacket)
 		TLOG.Debug("IN:", packet)
 		ch <- &packet
 	} else {
-		fmt.Println("AdapterProxy-------------------------------4")
 		TLOG.Error("timeout resp,drop it:", packet.IRequestId)
 	}
 }

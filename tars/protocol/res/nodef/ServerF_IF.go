@@ -42,7 +42,6 @@ func (_obj *ServerF) KeepAlive(ServerInfo *ServerInfo, _opt ...map[string]string
 	ctx := context.Background()
 	err = _obj.s.Tars_invoke(ctx, 0, "keepAlive", _os.ToBytes(), _status, _context, _resp)
 	if err != nil {
-		fmt.Println("keepAlive add111 fail : ",err)
 		return ret, err
 	}
 
@@ -51,7 +50,6 @@ func (_obj *ServerF) KeepAlive(ServerInfo *ServerInfo, _opt ...map[string]string
 	if err != nil {
 		return ret, err
 	}
-	fmt.Println("keepAlive add111 succ")
 	setMap(len(_opt), _resp, _context, _status)
 	_ = length
 	_ = have
