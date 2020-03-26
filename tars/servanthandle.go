@@ -44,9 +44,14 @@ func addServantCommon(v dispatch, f interface{}, obj string, withContext bool) {
 
 //AddHttpServant add http servant handler for obj.
 func AddHttpServant(mux *TarsHttpMux, obj string) {
-	cfg, ok := tarsConfig[obj]
+	fullobjname,err := fullObjName(obj)
+	if err != nil {
+		TLOG.Errorf("找不到对象服务即将关闭")
+		return
+	}
+	cfg, ok := tarsConfig[fullobjname]
 	if !ok {
-		TLOG.Debug("servant obj name not found ", obj)
+		TLOG.Errorf("servant obj name not found ", obj)
 		return
 	}
 	TLOG.Debug("add http server:", cfg)
