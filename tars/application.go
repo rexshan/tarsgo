@@ -236,6 +236,11 @@ func mainloop() {
 						ha.KeepAlive(name)
 					}
 				}
+
+				if _, ok := httpSvrs[adapter.Obj]; ok {
+					ha.KeepAlive(name)
+					continue
+				}
 			}
 
 		}

@@ -55,7 +55,7 @@ func AddHttpServant(mux *TarsHttpMux, obj string) {
 		return
 	}
 	TLOG.Debug("add http server:", cfg)
-	objRunList = append(objRunList, obj)
+	objRunList = append(objRunList, fullobjname)
 	appConf := GetServerConfig()
 	addrInfo := strings.SplitN(cfg.Address, ":", 2)
 	var port int
@@ -72,5 +72,5 @@ func AddHttpServant(mux *TarsHttpMux, obj string) {
 	}
 	mux.SetConfig(httpConf)
 	s := &http.Server{Addr: cfg.Address, Handler: mux}
-	httpSvrs[obj] = s
+	httpSvrs[fullobjname] = s
 }
