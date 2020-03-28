@@ -35,7 +35,11 @@ func (s *ServantProxy) Init(comm *Communicator, objName string) {
 	s.comm = comm
 	of := new(ObjectProxyFactory)
 	of.Init(comm)
-	s.timeout = s.comm.Client.AsyncInvokeTimeout
+	if s.comm.Client.AsyncInvokeTimeout > 0 {
+		s.timeout = s.comm.Client.AsyncInvokeTimeout
+	}else {
+		s.timeout = 3000  //默认给3000的超时控制
+	}
 	s.obj = of.GetObjectProxy(objName)
 }
 
