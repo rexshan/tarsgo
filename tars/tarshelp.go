@@ -74,7 +74,7 @@ func startFrameWorkComm() *Communicator {
 
 		c.s = NewServantProxyFactory(c)
 		if GetClientConfig() != nil {
-		//	c.setQueryPrx(GetClientConfig().Locator)
+			c.setQueryPrx(GetClientConfig().Locator)
 			c.SetLocator(GetClientConfig().Locator)
 		}
 		c.SetProperty("netconnectionnum", 1)

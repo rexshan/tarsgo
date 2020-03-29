@@ -1,6 +1,8 @@
 package tars
 
 import (
+	"github.com/rexshan/tarsgo/tars/protocol/res/queryf"
+	"github.com/rexshan/tarsgo/tars/sd"
 	"sync"
 
 	s "github.com/rexshan/tarsgo/tars/model"
@@ -126,3 +128,8 @@ func (c *Communicator) GetServantProxy(objName string) *ServantProxy {
 	return c.s.GetServantProxy(objName)
 }
 
+func (c *Communicator) setQueryPrx(obj string) {
+	qf := new(queryf.QueryF)
+	qf.SetServant(c.GetServantProxy(obj))
+	c.sd = sd.NewQueryFHelper(NewBucketWithRate(10,10), qf)
+}
