@@ -131,5 +131,5 @@ func (c *Communicator) GetServantProxy(objName string) *ServantProxy {
 func (c *Communicator) setQueryPrx(obj string) {
 	qf := new(queryf.QueryF)
 	qf.SetServant(c.GetServantProxy(obj))
-	c.sd = sd.NewQueryFHelper(NewBucketWithRate(10,10), qf)
+	c.sd = sd.NewQueryFHelper(sd.NewBucketWithRate(10,10), qf)
 }

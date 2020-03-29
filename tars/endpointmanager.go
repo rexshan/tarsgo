@@ -1,12 +1,12 @@
 package tars
 
 import (
+	"github.com/rexshan/tarsgo/tars/sd"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/rexshan/tarsgo/tars/protocol/res/endpointf"
-	"github.com/rexshan/tarsgo/tars/protocol/res/queryf"
 	"github.com/rexshan/tarsgo/tars/util/endpoint"
 	"github.com/rexshan/tarsgo/tars/util/set"
 )
@@ -167,7 +167,7 @@ func (e *EndpointManager) SelectAdapterProxy(msg *Message) *AdapterProxy {
 	return e.GetNextValidProxy()
 }
 
-func (e *EndpointManager) findAndSetObj(q *queryf.QueryF) {
+func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 	activeEp := new([]endpointf.EndpointF)
 	inactiveEp := new([]endpointf.EndpointF)
 	var setable, ok bool
@@ -178,9 +178,9 @@ func (e *EndpointManager) findAndSetObj(q *queryf.QueryF) {
 		setID, _ = e.comm.GetProperty("setdivision")
 	}
 	if setable {
-		ret, err = q.FindObjectByIdInSameSet(e.objName, setID, activeEp, inactiveEp)
+		ret, err = sdhelper.FindObjectByIdInSameSet(e.objName, setID, activeEp, inactiveEp)
 	} else {
-		ret, err = q.FindObjectByIdInSameGroup(e.objName, activeEp, inactiveEp)
+		ret, err = sdhelper.FindObjectByIdInSameGroup(e.objName, activeEp, inactiveEp)
 	}
 	if err != nil {
 		TLOG.Errorf("find obj end fail: %s %v", e.objName,err.Error())
