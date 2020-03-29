@@ -1,6 +1,10 @@
 package endpoint
 
-import "github.com/rexshan/tarsgo/tars/protocol/res/endpointf"
+import (
+	"github.com/rexshan/tarsgo/tars/protocol/res/endpointf"
+	"net"
+	"strconv"
+)
 
 //Tars2endpoint make endpointf.EndpointF to Endpoint struct.
 func Tars2endpoint(end endpointf.EndpointF) Endpoint {
@@ -15,6 +19,7 @@ func Tars2endpoint(end endpointf.EndpointF) Endpoint {
 		Istcp:   end.Istcp,
 		Proto:   proto,
 		Bind:    "",
+		IPPort:  net.JoinHostPort(end.Host,strconv.FormatInt(int64(end.Port),10)),
 		//Container: end.ContainerName,
 		SetId: end.SetId,
 	}

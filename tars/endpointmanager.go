@@ -25,6 +25,8 @@ type EndpointManager struct {
 	depth           int32
 }
 
+
+
 func (e *EndpointManager) setObjName(objName string) {
 	if objName == "" {
 		return
@@ -44,12 +46,6 @@ func (e *EndpointManager) setObjName(objName string) {
 		//[proxy] TODO singleton
 		TLOG.Debug("proxy mode:", objName)
 		e.objName = objName
-		//comm := NewCommunicator()
-		//comm.SetProperty("netthread", 1)
-		/*obj, _ := e.comm.GetProperty("locator")
-		q := new(queryf.QueryF)
-		e.comm.StringToProxy(obj, q)
-		*/
 		e.findAndSetObj(startFrameWorkComm().sd)
 		go func() {
 			loop := time.NewTicker(time.Duration(e.refreshInterval) * time.Millisecond)
@@ -59,6 +55,21 @@ func (e *EndpointManager) setObjName(objName string) {
 			}
 		}()
 	}
+}
+
+func NewEndpointManager(objName string, comm *Communicator) *EndpointManager {
+	e := &EndpointManager{
+		comm:            comm,
+		mlock:           new(sync.Mutex),
+		adapters:        make(map[string]*AdapterProxy),
+		refreshInterval: comm.Client.refreshEndpointInterval,
+		pointsSet:set.NewSet(),
+		directproxy:false,
+		pos:0,
+		depth:0,
+	}
+	e.setObjName(objName)
+	return e
 }
 
 // Init endpoint struct.
@@ -168,6 +179,9 @@ func (e *EndpointManager) SelectAdapterProxy(msg *Message) *AdapterProxy {
 }
 
 func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
+	if sdhelper == nil {
+		return
+	}
 	activeEp := new([]endpointf.EndpointF)
 	inactiveEp := new([]endpointf.EndpointF)
 	var setable, ok bool

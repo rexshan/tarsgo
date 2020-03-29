@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -20,12 +19,13 @@ type ObjectProxy struct {
 	queueLen int32
 }
 
-// Init proxy
-func (obj *ObjectProxy) Init(comm *Communicator, objName string) {
-	obj.comm = comm
-	obj.manager = new(EndpointManager)
-	obj.manager.Init(objName, obj.comm)
+func NewObjectProxy(comm *Communicator, objName string) *ObjectProxy {
+	return &ObjectProxy{
+		comm:    comm,
+		manager: NewEndpointManager(objName, comm),
+	}
 }
+
 
 // Invoke get proxy information
 func (obj *ObjectProxy) Invoke(ctx context.Context, msg *Message, timeout time.Duration) error {
@@ -86,29 +86,4 @@ func (obj *ObjectProxy)GetAvailableProxys() map[string]*AdapterProxy{
 	return obj.manager.GetAvailableProxys()
 }
 
-// ObjectProxyFactory is a struct contains proxy information(add)
-type ObjectProxyFactory struct {
-	objs map[string]*ObjectProxy
-	comm *Communicator
-	om   *sync.Mutex
-}
 
-// Init ObjectProxyFactory
-func (o *ObjectProxyFactory) Init(comm *Communicator) {
-	o.om = new(sync.Mutex)
-	o.comm = comm
-	o.objs = make(map[string]*ObjectProxy)
-}
-
-// GetObjectProxy get objectproxy
-func (o *ObjectProxyFactory) GetObjectProxy(objName string) *ObjectProxy {
-	o.om.Lock()
-	defer o.om.Unlock()
-	if obj, ok := o.objs[objName]; ok {
-		return obj
-	}
-	obj := new(ObjectProxy)
-	obj.Init(o.comm, objName)
-	o.objs[objName] = obj
-	return obj
-}

@@ -70,8 +70,7 @@ func (c *Communicator) init() {
 		}
 	}
 
-	c.s = new(ServantProxyFactory)
-	c.s.Init(c)
+	c.s = NewServantProxyFactory(c)
 }
 
 // GetLocator returns locator as string

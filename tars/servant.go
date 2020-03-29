@@ -24,23 +24,24 @@ type ServantProxy struct {
 	isHash   bool
 }
 
-//Init init the ServantProxy struct.
-func (s *ServantProxy) Init(comm *Communicator, objName string) {
+
+func NewServantProxy(comm *Communicator, objName string) *ServantProxy {
+	s := &ServantProxy{
+		comm: comm,
+	}
 	pos := strings.Index(objName, "@")
 	if pos > 0 {
 		s.name = objName[0:pos]
 	} else {
 		s.name = objName
 	}
-	s.comm = comm
-	of := new(ObjectProxyFactory)
-	of.Init(comm)
 	if s.comm.Client.AsyncInvokeTimeout > 0 {
 		s.timeout = s.comm.Client.AsyncInvokeTimeout
 	}else {
 		s.timeout = 3000  //默认给3000的超时控制
 	}
-	s.obj = of.GetObjectProxy(objName)
+	s.obj = NewObjectProxy(comm, objName)
+	return s
 }
 
 //TarsSetTimeout sets the timeout for client calling the server , which is in ms.
@@ -173,30 +174,39 @@ type ServantProxyFactory struct {
 }
 
 func NewServantProxyFactory(comm *Communicator) *ServantProxyFactory {
-	f := &ServantProxyFactory{}
-	f.Init(comm)
-	return f
+	return &ServantProxyFactory{
+		comm: comm,
+		fm:new(sync.RWMutex),
+		objs: make(map[string]*ServantProxy),
+	}
 }
 
-//Init init the  ServantProxyFactory.
-func (o *ServantProxyFactory) Init(comm *Communicator) {
-	o.fm = new(sync.RWMutex)
-	o.comm = comm
-	o.objs = make(map[string]*ServantProxy)
-}
 
 //GetServantProxy gets the ServanrProxy for the object.
 func (o *ServantProxyFactory) GetServantProxy(objName string) *ServantProxy {
-	o.fm.Lock()
+	proxy := o.getProxy(objName)
+	if proxy != nil {
+		return proxy
+	}
+	return o.createProxy(objName)
+}
+
+func (o *ServantProxyFactory)getProxy(objName string)*ServantProxy {
+	o.fm.RLock()
+	defer o.fm.RUnlock()
 	if obj, ok := o.objs[objName]; ok {
-		o.fm.Unlock()
 		return obj
 	}
-	o.fm.Unlock()
-	obj := new(ServantProxy)
-	obj.Init(o.comm, objName)
+	return nil
+}
+
+func (o *ServantProxyFactory) createProxy(objName string) *ServantProxy {
 	o.fm.Lock()
+	defer o.fm.Unlock()
+	if obj, ok := o.objs[objName]; ok {
+		return obj
+	}
+	obj := NewServantProxy(o.comm, objName)
 	o.objs[objName] = obj
-	o.fm.Unlock()
 	return obj
 }
