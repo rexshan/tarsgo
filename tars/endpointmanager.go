@@ -46,15 +46,16 @@ func (e *EndpointManager) setObjName(objName string) {
 		e.objName = objName
 		//comm := NewCommunicator()
 		//comm.SetProperty("netthread", 1)
-		obj, _ := e.comm.GetProperty("locator")
+		/*obj, _ := e.comm.GetProperty("locator")
 		q := new(queryf.QueryF)
 		e.comm.StringToProxy(obj, q)
-		e.findAndSetObj(q)
+		*/
+		e.findAndSetObj(startFrameWorkComm().sd)
 		go func() {
 			loop := time.NewTicker(time.Duration(e.refreshInterval) * time.Millisecond)
 			for range loop.C {
 				//TODO exit
-				e.findAndSetObj(q)
+				e.findAndSetObj(startFrameWorkComm().sd)
 			}
 		}()
 	}
@@ -182,7 +183,7 @@ func (e *EndpointManager) findAndSetObj(q *queryf.QueryF) {
 		ret, err = q.FindObjectByIdInSameGroup(e.objName, activeEp, inactiveEp)
 	}
 	if err != nil {
-		TLOG.Error("find obj end fail:", err.Error())
+		TLOG.Errorf("find obj end fail: %s %v", e.objName,err.Error())
 		return
 	}
 	TLOG.Debug("find obj endpoint:", e.objName, ret, *activeEp, *inactiveEp)

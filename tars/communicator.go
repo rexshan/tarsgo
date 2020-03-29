@@ -33,6 +33,7 @@ type Communicator struct {
 	s          *ServantProxyFactory
 	Client     *clientConfig
 	properties sync.Map
+	sd         sd.SDHelper
 }
 
 func (c *Communicator) init() {
