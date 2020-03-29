@@ -5,8 +5,10 @@ package tars
 import (
 	"flag"
 	"fmt"
+	"github.com/rexshan/tarsgo/tars/util/appzaplog"
 	"net/http"
 	"os"
+	"path"
 	"sync"
 	"time"
 
@@ -37,6 +39,7 @@ var (
 )
 
 func init() {
+	appzaplog.InitAppLog()
 	tarsConfig = make(map[string]*transport.TarsServerConf)
 	goSvrs = make(map[string]*transport.TarsServer)
 	httpSvrs = make(map[string]*http.Server)
@@ -44,6 +47,14 @@ func init() {
 	adminMethods = make(map[string]adminFn)
 	rogger.SetLevel(rogger.ERROR)
 	Init()
+	appzaplog.Sync()
+	srvConfig := GetServerConfig()
+	if srvConfig != nil {
+		logPath := srvConfig.LogPath + "/" + srvConfig.App + "/" + srvConfig.Server + "/" + srvConfig.Server + ".log"
+		appzaplog.InitAppLog(appzaplog.ProcessName(path.Base(os.Args[0])+"_rd"), appzaplog.LogPath(logPath), appzaplog.TestEnv(false))
+	}
+	comm := startFrameWorkComm()
+	initFrameWorkClient(comm)
 }
 
 //Init should run before GetServerConfig & GetClientConfig , or before run
@@ -135,9 +146,9 @@ func initConfig() {
 		tarsConfig[svrObj] = conf
 	}
 	TLOG.Debug("config add ", tarsConfig)
+
 	localString := c.GetString("/tars/application/server<local>")
 	localpoint := endpoint.Parse(localString)
-
 	adminCfg := &transport.TarsServerConf{
 		Proto:          "tcp",
 		Address:        fmt.Sprintf("%s:%d", localpoint.Host, localpoint.Port),
@@ -152,14 +163,15 @@ func initConfig() {
 		TCPReadBuffer:  TCPReadBuffer,
 		TCPWriteBuffer: TCPWriteBuffer,
 	}
-
 	tarsConfig["AdminObj"] = adminCfg
 	svrCfg.Adapters["AdminAdapter"] = adapterConfig{localpoint, "tcp", "AdminObj", 1}
+
 }
+
 
 func initFrameWorkClient(c *Communicator) {
 	if cc := GetClientConfig(); cc != nil {
-		go initReport(c, cc.stat)
+		initReport(c, cc.stat)
 	}
 	return
 }
@@ -167,10 +179,6 @@ func initFrameWorkClient(c *Communicator) {
 //Run the application
 func Run() {
 	Init()
-	TLOG.Debug("Run the application ")
-	comm := startFrameWorkComm()
-	initFrameWorkClient(comm)
-	TLOG.Debug("config add111999999999 ")
 	<-statInited
 	TLOG.Debug("config add111 ")
 	// add adminF

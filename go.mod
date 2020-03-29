@@ -12,4 +12,6 @@ require (
 	github.com/opentracing-contrib/go-observer v0.0.0-20170622124052-a52f23424492 // indirect
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/openzipkin-contrib/zipkin-go-opentracing v0.3.5
+	github.com/pkg/errors v0.9.1
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )

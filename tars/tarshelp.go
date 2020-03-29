@@ -48,7 +48,6 @@ func NewPbCommunicator() *Communicator {
 func startFrameWorkComm() *Communicator {
 	once.Do(func() {
 		c := new(Communicator)
-		//c.init()
 		if GetClientConfig() != nil {
 			c.Client = GetClientConfig()
 			c.SetProperty("netconnectionnum", c.Client.netconnectionnum)
