@@ -29,10 +29,10 @@ type (
 		comm *tars.Communicator
 	}
 
-	/*WebsocketToRPC struct {
+	WebsocketToRPC struct {
 		comm *tars.Communicator
 	}
-	*/
+
 
 	MSGToRPC struct {
 		comm *tars.Communicator
@@ -100,6 +100,22 @@ func (t *TCPToRPC) Encode(output RPCOutput) (body json.RawMessage, err error) {
 		return
 	}
 	return
+}
+
+func NewWebsocketToRPC(c *tars.Communicator) RPCInvoker {
+	return &WebsocketToRPC{comm: c}
+}
+
+func (w *WebsocketToRPC) Decode(body json.RawMessage) (input RPCInput, err error) {
+	return input, nil
+}
+
+func (w *WebsocketToRPC) Invoke(input RPCInput) (output RPCOutput, err error) {
+	return output, nil
+}
+
+func (w *WebsocketToRPC) Encode(output RPCOutput) (body json.RawMessage, err error) {
+	return nil, nil
 }
 
 /*----------------------------MSGToRPC-----------------------------------------*/
