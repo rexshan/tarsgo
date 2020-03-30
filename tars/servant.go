@@ -93,7 +93,7 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 		err = s.obj.Invoke(ctx, msg, time.Duration(s.timeout)*time.Millisecond)
 	}
 	if err != nil {
-		TLOG.Errorf("Invoke Obj:%s,fun:%s,error:%s", s.name, sFuncName, err.Error())
+		TLOG.Errorf("Invoke Obj:%s,fun:%s,error:%s timeout: %d", s.name, sFuncName, err.Error(),s.timeout)
 		if msg.Resp == nil {
 			ReportStat(msg, 0, 0, 1)
 		} else if msg.Status == basef.TARSINVOKETIMEOUT {
