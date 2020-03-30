@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	pb "github.com/golang/protobuf/proto"
+	"github.com/pkg/errors"
 	"github.com/rexshan/tarsgo/tars"
 	"github.com/rexshan/tarsgo/tars/protocol/res/requestf"
 	"github.com/rexshan/tarsgo/tars/util/tools"
@@ -39,6 +40,9 @@ type (
 	}
 )
 
+var (
+	NotFoundRouterError = errors.New("not found router")
+)
 
 
 func invoke(comm *tars.Communicator, input RPCInput) (out RPCOutput, err error) {
@@ -133,11 +137,15 @@ func (m *MSGToRPC)Decode(body json.RawMessage)(input MSGInput,err error) {
 }
 
 func (m *MSGToRPC)Invoke(input MSGInput,Srv,Func string)(output MSGOutput,err error) {
-	start := time.Now().UnixNano() / int64(time.Millisecond)
-	out, err := m.invokeWidth(m.comm, input,Srv,Func)
-	end := time.Now().UnixNano() / int64(time.Millisecond)
-	tars.TLOG.Infof("MSGInput exec time :%d %s %s %+v", int64(end-start), Srv,Func, input.Opt)
-	return out, err
+	if Srv != "" && Func != "" {
+		start := time.Now().UnixNano() / int64(time.Millisecond)
+		out, err := m.invokeWidth(m.comm, input,Srv,Func)
+		end := time.Now().UnixNano() / int64(time.Millisecond)
+		tars.TLOG.Infof("MSGInput exec time :%d %s %s %+v", int64(end-start), Srv,Func, input.Opt)
+		return out, err
+	}
+	err = NotFoundRouterError
+	return
 }
 
 func (m *MSGToRPC)Encode(output MSGOutput)(body json.RawMessage,err error) {
