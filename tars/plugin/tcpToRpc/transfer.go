@@ -120,7 +120,7 @@ func (m *MSGToRPC)Invoke(input MSGInput,Srv,Func string)(output MSGOutput,err er
 	start := time.Now().UnixNano() / int64(time.Millisecond)
 	out, err := m.invokeWidth(m.comm, input,Srv,Func)
 	end := time.Now().UnixNano() / int64(time.Millisecond)
-	tars.TLOG.Infof("MSGInput exec time :%d %s %s %+v", int64(end-start), input.Obj, input.Func, input.Opt)
+	tars.TLOG.Infof("MSGInput exec time :%d %s %s %+v", int64(end-start), Srv,Func, input.Opt)
 	return out, err
 }
 
