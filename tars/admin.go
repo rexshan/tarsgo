@@ -60,7 +60,7 @@ func (a *Admin) Notify(command string) (string, error) {
 		if err != nil {
 			return fmt.Sprintf("Getconfig Error!: %s", cmd[1]), err
 		}
-		go noticeLoadConfig(cmd[1],c)
+		noticeLoadConfig(cmd[1],c)
 		return fmt.Sprintf("Getconfig Success!: %s", cmd[1]), nil
 
 	case "tars.connection":

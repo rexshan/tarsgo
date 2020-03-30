@@ -112,6 +112,6 @@ func noticeLoadConfig(fileName string,content string){
 	select {
 	case subCfgChan <- &CfgItem{FileName:fileName,Content:content}:
 	default:
-		break
+		TLOG.Warnf("not consumer config drop it :%s",fileName)
 	}
 }
