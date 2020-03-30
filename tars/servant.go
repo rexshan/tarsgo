@@ -40,6 +40,7 @@ func NewServantProxy(comm *Communicator, objName string) *ServantProxy {
 	}else {
 		s.timeout = 3000  //默认给3000的超时控制
 	}
+	TLOG.Info("-------------------- Servant time out set %d",s.timeout)
 	s.obj = NewObjectProxy(comm, objName)
 	return s
 }
@@ -92,6 +93,7 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	} else {
 		err = s.obj.Invoke(ctx, msg, time.Duration(s.timeout)*time.Millisecond)
 	}
+
 	if err != nil {
 		TLOG.Errorf("Invoke Obj:%s,fun:%s,error:%s timeout: %d", s.name, sFuncName, err.Error(),s.timeout)
 		if msg.Resp == nil {
