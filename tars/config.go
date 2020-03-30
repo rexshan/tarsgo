@@ -10,7 +10,7 @@ var svrCfg *serverConfig
 var cltCfg *clientConfig
 var subCfgChan chan *CfgItem
 
-type ConfigListener func(string)
+type ConfigListener func(string,string)
 
 type CfgItem struct {
 	FileName string
@@ -92,20 +92,23 @@ func fullObjName(obj string)(string,error) {
 	return fullObjName,nil
 }
 
-func SubTarsConfig(fileName string,listener ConfigListener) {
-	go func(f string ,w ConfigListener ) {
+func SubTarsConfig(listener ConfigListener,fileName ...string) {
+	go func(w ConfigListener,fl ...string) {
 		CheckGoPanic()
 		for {
 			select {
 			case item, ok := <-subCfgChan:
 				if ok {
-					if item.FileName == f {
-						w(item.Content)
+					for _,f := range fl {
+						if item.FileName == f {
+							w(f,item.Content)
+						}
 					}
+
 				}
 			}
 		}
-	}(fileName,listener)
+	}(listener,fileName...)
 }
 
 func noticeLoadConfig(fileName string,content string){
