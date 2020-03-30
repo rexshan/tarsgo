@@ -94,6 +94,7 @@ func fullObjName(obj string)(string,error) {
 
 func SubTarsConfig(fileName string,listener ConfigListener) {
 	go func(f string ,w ConfigListener ) {
+		CheckGoPanic()
 		for {
 			select {
 			case item, ok := <-subCfgChan:
