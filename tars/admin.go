@@ -2,6 +2,7 @@ package tars
 
 import (
 	"fmt"
+	"github.com/rexshan/tarsgo/tars/util/appzaplog"
 	"strings"
 
 	debugutil "github.com/rexshan/tarsgo/tars/util/debug"
@@ -34,13 +35,18 @@ func (a *Admin) Notify(command string) (string, error) {
 		switch cmd[1] {
 		case "INFO":
 			logger.SetLevel(logger.INFO)
+			_ = appzaplog.SetLogLevel("info")
 		case "WARN":
 			logger.SetLevel(logger.WARN)
+			_ = appzaplog.SetLogLevel("warn")
 		case "ERROR":
 			logger.SetLevel(logger.ERROR)
+			_ = appzaplog.SetLogLevel("error")
 		case "DEBUG":
+			_ = appzaplog.SetLogLevel("debug")
 			logger.SetLevel(logger.DEBUG)
 		case "NONE":
+			_ = appzaplog.SetLogLevel("none")
 			logger.SetLevel(logger.OFF)
 		}
 		return fmt.Sprintf("%s succ", command), nil
@@ -50,10 +56,11 @@ func (a *Admin) Notify(command string) (string, error) {
 	case "tars.loadconfig":
 		cfg := GetServerConfig()
 		remoteConf := NewRConf(cfg.App, cfg.Server, cfg.BasePath)
-		_, err := remoteConf.GetConfig(cmd[1])
+		c, err := remoteConf.GetConfig(cmd[1])
 		if err != nil {
 			return fmt.Sprintf("Getconfig Error!: %s", cmd[1]), err
 		}
+		go noticeLoadConfig(cmd[1],c)
 		return fmt.Sprintf("Getconfig Success!: %s", cmd[1]), nil
 
 	case "tars.connection":
@@ -70,3 +77,5 @@ func (a *Admin) Notify(command string) (string, error) {
 func RegisterAdmin(name string, fn adminFn) {
 	adminMethods[name] = fn
 }
+
+

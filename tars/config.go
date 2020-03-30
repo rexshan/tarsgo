@@ -8,6 +8,14 @@ import (
 
 var svrCfg *serverConfig
 var cltCfg *clientConfig
+var subCfgChan chan *CfgItem
+
+type ConfigListener func(string)
+
+type CfgItem struct {
+	FileName string
+	Content  string
+}
 
 // GetServerConfig : Get server config
 func GetServerConfig() *serverConfig {
@@ -82,4 +90,27 @@ func fullObjName(obj string)(string,error) {
 		}, ".")
 	}
 	return fullObjName,nil
+}
+
+func SubTarsConfig(fileName string,listener ConfigListener) {
+	go func(f string ,w ConfigListener ) {
+		for {
+			select {
+			case item, ok := <-subCfgChan:
+				if ok {
+					if item.FileName == f {
+						go w(item.Content)
+					}
+				}
+			}
+		}
+	}(fileName,listener)
+}
+
+func noticeLoadConfig(fileName string,content string){
+	select {
+	case subCfgChan <- &CfgItem{FileName:fileName,Content:content}:
+	default:
+		break
+	}
 }
