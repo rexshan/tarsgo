@@ -100,7 +100,7 @@ func SubTarsConfig(fileName string,listener ConfigListener) {
 			case item, ok := <-subCfgChan:
 				if ok {
 					if item.FileName == f {
-						go w(item.Content)
+						w(item.Content)
 					}
 				}
 			}
