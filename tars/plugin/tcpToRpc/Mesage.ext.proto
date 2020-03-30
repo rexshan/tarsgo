@@ -1,0 +1,17 @@
+syntax = "proto3";
+option objc_class_prefix = "PROTO";
+package tcpToRpc;
+
+
+message MSGInput {
+   string alias           = 1;         //  具体函数方法
+   map<string,string> opt = 3;  //  进入房间需要带上key=subscribe-room-push value = roomId 退出房间 value = -1
+   bytes  req             = 2;         //  请求数据包
+}
+
+message MSGOutput {
+    int32 ret  = 1;              // 返回值
+	map<string,string>    opt = 2;  // 上下文
+	bytes rsp  = 3;              // 返回数据包
+	string desc = 4;             // 错误信息
+}
