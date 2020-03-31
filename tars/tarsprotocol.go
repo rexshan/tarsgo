@@ -70,6 +70,7 @@ func (s *TarsProtocol) Invoke(ctx context.Context, req []byte) (rsp []byte) {
 		rspPackage.IRequestId = reqPackage.IRequestId
 		rspPackage.IRet = 1
 		rspPackage.SResultDesc = err.Error()
+		rspPackage.Status[STATUSERRSTR] = err.Error()
 	}
 	return s.rsp2Byte(&rspPackage)
 }
