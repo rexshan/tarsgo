@@ -24,6 +24,9 @@ type ServantProxy struct {
 	isHash   bool
 }
 
+const (
+	STATUSERRSTR = "errstring"
+)
 
 func NewServantProxy(comm *Communicator, objName string) *ServantProxy {
 	s := &ServantProxy{
@@ -107,6 +110,9 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	}
 	msg.End()
 	*Resp = *msg.Resp
+	if errStr,ok := msg.Resp.Status[STATUSERRSTR];ok {
+		return errors.New(errStr)
+	}
 	//report
 	ReportStat(msg, 1, 0, 0)
 	return err
@@ -164,6 +170,9 @@ func (s *ServantProxy)ProxyInvoke(ctx context.Context, cType byte, sFuncName str
 		return err
 	}
 	*Resp = *msg.Resp
+	if errStr,ok := msg.Resp.Status[STATUSERRSTR];ok {
+		return errors.New(errStr)
+	}
 	ReportStat(msg, 1, 0, 0)
 	return nil
 }
