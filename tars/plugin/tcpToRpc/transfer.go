@@ -149,7 +149,7 @@ func (m *MSGToRPC)Invoke(input MSGInput,Srv,Func string)(output MSGOutput,err er
 }
 
 func (m *MSGToRPC)Encode(output MSGOutput)(body json.RawMessage,err error) {
-	tars.TLOG.Debugf("MSGOutput encode:%d %s %s %+v", output.Ret, output.Desc, output.Opt)
+	tars.TLOG.Debugf("MSGOutput encode:%d %s %s ", output.Ret, output.Desc, output.Opt)
 	if body, err = pb.Marshal(&output); err != nil {
 		tars.TLOG.Errorf("MSGOutput encode error :%+v", err)
 		return
