@@ -1,6 +1,9 @@
 package tars
 
-import "context"
+import (
+	"context"
+	"strconv"
+)
 
 type ctxOutgoingKey struct{}
 type MD map[string]string
@@ -22,4 +25,16 @@ func String(ctx context.Context, key string) string {
 	}
 	str, _ := md[key]
 	return str
+}
+
+func Int64(ctx context.Context, key string) int64 {
+	md, ok := ctx.Value(ctxOutgoingKey{}).(MD)
+	if !ok {
+		return 0
+	}
+	i64,err := strconv.ParseInt(md[key], 10, 64)
+	if err != nil {
+		return 0
+	}
+	return i64
 }
