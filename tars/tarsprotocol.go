@@ -33,7 +33,7 @@ func NewTarsProtocol(dispatcher dispatch, imp interface{}, withContext bool) *Ta
 
 //Invoke puts the request as []byte and call the dispather, and then return the response as []byte.
 func (s *TarsProtocol) Invoke(ctx context.Context, req []byte) (rsp []byte) {
-	defer checkPanic()
+	defer CheckGoPanic()
 	reqPackage := requestf.RequestPacket{}
 	rspPackage := requestf.ResponsePacket{}
 	is := codec.NewReader(req)
@@ -70,6 +70,7 @@ func (s *TarsProtocol) Invoke(ctx context.Context, req []byte) (rsp []byte) {
 		rspPackage.IRequestId = reqPackage.IRequestId
 		rspPackage.IRet = 1
 		rspPackage.SResultDesc = err.Error()
+		rspPackage.Status= make(map[string]string)
 		rspPackage.Status[STATUSERRSTR] = err.Error()
 	}
 	return s.rsp2Byte(&rspPackage)
