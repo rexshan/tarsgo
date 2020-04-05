@@ -67,9 +67,19 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	reqContext map[string]string,
 	Resp *requestf.ResponsePacket) error {
 	defer checkPanic()
+	var reqCtxMap map[string]string
 	//TODO 重置sid，防止溢出
 	atomic.CompareAndSwapInt32(&s.sid, 1<<31-1, 1)
 
+	if reqContext != nil {
+		reqCtxMap = reqContext
+	}else {
+		if v,ok := current.GetRequestContext(ctx);ok {
+			reqCtxMap = v
+		}else {
+			reqCtxMap = make(map[string]string)
+		}
+	}
 	req := requestf.RequestPacket{
 		IVersion:     1,
 		CPacketType:  0,
@@ -78,7 +88,7 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 		SFuncName:    sFuncName,
 		SBuffer:      tools.ByteToInt8(buf),
 		ITimeout:     ReqDefaultTimeout,
-		Context:      reqContext,
+		Context:      reqCtxMap,
 		Status:       status,
 	}
 	msg := &Message{Req: &req, Ser: s, Obj: s.obj}
