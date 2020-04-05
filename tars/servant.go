@@ -3,6 +3,7 @@ package tars
 import (
 	"context"
 	"errors"
+	"github.com/rexshan/tarsgo/tars/util/current"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -65,15 +66,10 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	buf []byte,status map[string]string,
 	reqContext map[string]string,
 	Resp *requestf.ResponsePacket) error {
-	var sndCtx map[string]string
 	defer checkPanic()
 	//TODO 重置sid，防止溢出
 	atomic.CompareAndSwapInt32(&s.sid, 1<<31-1, 1)
-	if ctxMap,ok := FromOutgoingContext(ctx);ok {
-		sndCtx = ctxMap
-	}else {
-		sndCtx = reqContext
-	}
+
 	req := requestf.RequestPacket{
 		IVersion:     1,
 		CPacketType:  0,
@@ -82,7 +78,7 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 		SFuncName:    sFuncName,
 		SBuffer:      tools.ByteToInt8(buf),
 		ITimeout:     ReqDefaultTimeout,
-		Context:      sndCtx,
+		Context:      reqContext,
 		Status:       status,
 	}
 	msg := &Message{Req: &req, Ser: s, Obj: s.obj}
@@ -135,8 +131,10 @@ func (s *ServantProxy)ProxyInvoke(ctx context.Context, cType byte, sFuncName str
 	adpMap := s.obj.GetAvailableProxys()
 	adp := adpMap[ipPort]
 	atomic.CompareAndSwapInt32(&s.sid, 1<<31-1, 1)
-	ctxMap,_ := FromOutgoingContext(ctx)
-
+	ctxMap,ok := current.GetRequestContext(ctx)
+	if !ok {
+		ctxMap = make(map[string]string)
+	}
 	req := requestf.RequestPacket{
 		IVersion:     1,
 		CPacketType:  int8(cType),
