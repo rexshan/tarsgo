@@ -21,7 +21,7 @@ type ServantProxy struct {
 	comm     *Communicator
 	obj      *ObjectProxy
 	timeout  int
-	hashcode int64
+	hashcode string
 	isHash   bool
 }
 
@@ -55,9 +55,11 @@ func (s *ServantProxy) TarsSetTimeout(t int) {
 }
 
 //TarsSetHashCode sets the hash code for client calling the server , which is for Message hash code.
-func (s *ServantProxy) TarsSetHashCode(code int64) {
-	s.hashcode = code
-	s.isHash = true
+func (s *ServantProxy) TarsSetHashCode(code string) {
+	if len(code) > 0 {
+		s.hashcode = code
+		s.isHash = true
+	}
 }
 
 //Tars_invoke is use for client inoking server.
@@ -94,7 +96,7 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	msg := &Message{Req: &req, Ser: s, Obj: s.obj}
 	msg.Init()
 	if s.isHash {
-		msg.SetHashCode(s.hashcode)
+		msg.setConsistHashCode(s.hashcode)
 	}
 	var err error
 	if allFilters.cf != nil {

@@ -86,4 +86,6 @@ const (
 	TCPWriteBuffer = 128 * 1024 * 1024
 	//TCPNoDelay set tcp no delay
 	TCPNoDelay = false
+
+	CONTEXTCONSISTHASHKEY = "consisthashkey"
 )

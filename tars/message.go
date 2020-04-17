@@ -19,8 +19,10 @@ type Message struct {
 	EndTime   int64
 	Status    int32
 
-	hashCode int64
+	hashCode string
 	isHash   bool
+
+	isConsistHash bool
 }
 
 // Init define the begintime
@@ -39,7 +41,12 @@ func (m *Message) Cost() int64 {
 }
 
 // SetHashCode set hash code
-func (m *Message) SetHashCode(code int64) {
+func (m *Message) SetHashCode(code string) {
 	m.hashCode = code
 	m.isHash = true
+}
+
+func (m *Message) setConsistHashCode(code string) {
+	m.hashCode = code
+	m.isConsistHash = true
 }

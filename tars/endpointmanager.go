@@ -2,6 +2,9 @@ package tars
 
 import (
 	"github.com/rexshan/tarsgo/tars/sd"
+	"github.com/rexshan/tarsgo/tars/util/hash"
+	"net"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -23,6 +26,7 @@ type EndpointManager struct {
 	refreshInterval int
 	pos             int32
 	depth           int32
+	consistadapters *hash.HashRing
 }
 
 
@@ -42,6 +46,10 @@ func (e *EndpointManager) setObjName(objName string) {
 		}
 		e.index = e.pointsSet.Slice()
 
+		for _, v := range e.index {
+			ep := v.(endpoint.Endpoint)
+			e.consistadapters = e.consistadapters.AddNode(ep.IPPort)
+		}
 	} else {
 		//[proxy] TODO singleton
 		TLOG.Debug("proxy mode:", objName)
@@ -67,6 +75,7 @@ func NewEndpointManager(objName string, comm *Communicator) *EndpointManager {
 		directproxy:false,
 		pos:0,
 		depth:0,
+		consistadapters: hash.New([]string{}),
 	}
 	e.setObjName(objName)
 	return e
@@ -145,18 +154,78 @@ func (e *EndpointManager) createProxy(ep endpoint.Endpoint) {
 	e.adapters[ep.IPPort] = NewAdapterProxy(&end,e.comm)
 }
 
-// GetHashProxy returns hash adapter information.
-func (e *EndpointManager) GetHashProxy(hashcode int64) *AdapterProxy {
-	// very unsafe.
-	ep := e.GetHashEndpoint(hashcode)
+func (e *EndpointManager) GetHashProxy(hashcode string) *AdapterProxy {
+	intHashCode,err := strconv.ParseInt(hashcode,10,64)
+	if err != nil {
+		return nil
+	}
+	e.mlock.Lock()
+	ep := e.GetHashEndpoint(intHashCode)
 	if ep == nil {
+		e.mlock.Unlock()
 		return nil
 	}
 	if adp, ok := e.adapters[ep.IPPort]; ok {
+		e.mlock.Unlock()
 		return adp
 	}
 	e.createProxy(*ep)
+	e.mlock.Unlock()
 	return e.adapters[ep.IPPort]
+}
+
+
+func (e *EndpointManager)GetConsistHashProxy(hashcode string) *AdapterProxy {
+	var (
+		localadapter *AdapterProxy
+		ipport string
+		ok bool
+		err error
+	)
+	e.mlock.Lock()
+	ipport,ok = e.consistadapters.GetNode(hashcode)
+	if !ok {
+		e.mlock.Unlock()
+		TLOG.Warnf("GetConsistHashProxy not found %s",hashcode)
+		return localadapter
+	}
+
+	if localadapter, ok = e.adapters[ipport]; ok {
+		e.mlock.Unlock()
+		if localadapter.Available(){
+			return localadapter
+		}
+		TLOG.Warnf("GetConsistHashProxy not found %s %s",hashcode,ipport)
+		return nil
+	}
+
+	localadapter,err = e.createProxyByIp(ipport)
+	e.mlock.Unlock()
+	if err != nil {
+		TLOG.Warnf("GetConsistHashProxy createProxy %s %s",hashcode,ipport)
+		return nil
+	}
+	return localadapter
+}
+
+func (e *EndpointManager)createProxyByIp(ipport string)(*AdapterProxy,error) {
+	host,port,err := net.SplitHostPort(ipport)
+	if err != nil {
+		TLOG.Warnf("SplitHostPort not found %s ",ipport)
+		return nil,err
+	}
+	intPort,err := strconv.ParseInt(port,10,64)
+	if err != nil {
+		TLOG.Warnf("ParseInt not found %s",ipport)
+		return nil,err
+	}
+	ed := endpointf.EndpointF{
+		Host:host,
+		Port:int32(intPort),
+		Istcp:1,
+	}
+	e.adapters[ipport] = NewAdapterProxy(&ed, e.comm)
+	return e.adapters[ipport],nil
 }
 
 // GetHashEndpoint returns hash endpoint information.
@@ -172,10 +241,14 @@ func (e *EndpointManager) GetHashEndpoint(hashcode int64) *endpoint.Endpoint {
 
 // SelectAdapterProxy returns selected adapter.
 func (e *EndpointManager) SelectAdapterProxy(msg *Message) *AdapterProxy {
-	if msg.isHash {
+	switch  {
+	case msg.isConsistHash:
+		return e.GetConsistHashProxy(msg.hashCode)
+	case msg.isHash:
 		return e.GetHashProxy(msg.hashCode)
+	default:
+		return e.GetNextValidProxy()
 	}
-	return e.GetNextValidProxy()
 }
 
 func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
@@ -209,6 +282,7 @@ func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 			e.pointsSet.Remove(end)
 			if a, ok := e.adapters[end.IPPort]; ok {
 				delete(e.adapters, end.IPPort)
+				e.consistadapters = e.consistadapters.RemoveNode(end.IPPort)
 				a.Close()
 			}
 		}
@@ -220,6 +294,7 @@ func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 		for _, ep := range *activeEp {
 			end := endpoint.Tars2endpoint(ep)
 			e.pointsSet.Add(end)
+			e.consistadapters = e.consistadapters.AddNode(net.JoinHostPort(ep.Host,strconv.FormatInt(int64(ep.Port),10)))
 		}
 		e.index = e.pointsSet.Slice()
 	}
@@ -228,6 +303,7 @@ func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 		if !e.pointsSet.Has(end) {
 			if a, ok := e.adapters[k]; ok {
 				delete(e.adapters, k)
+				e.consistadapters = e.consistadapters.RemoveNode(k)
 				a.Close()
 			}
 		}

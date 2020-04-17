@@ -136,6 +136,10 @@ func (c *AdapterProxy)onBreaker(err *error){
 	}
 }
 
+func (c *AdapterProxy)Available()bool  {
+	return c.breaker.Allow() == nil
+}
+
 // GetPoint : Get an endpoint
 func (c *AdapterProxy) GetPoint() *endpointf.EndpointF {
 	return c.point

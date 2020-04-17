@@ -164,6 +164,7 @@ func (m *MSGToRPC)invokeWidth(comm *tars.Communicator,input MSGInput,Obj,Func st
 	)
 	rpcStub = comm.GetServantProxy(Obj)
 	_resp := new(requestf.ResponsePacket)
+	rpcStub.TarsSetHashCode(input.Opt["uid"])
 	err = rpcStub.Tars_invoke(context.Background(), 0, LcFirst(Func), input.Req, _status, input.Opt, _resp)
 	if err != nil {
 		tars.TLOG.Errorf("rpc invoke err :%s  %s %+v  %+v", Obj, Func, input.Opt,err)
