@@ -2,6 +2,8 @@ package tars
 
 import (
 	"github.com/rexshan/tarsgo/tars/sd"
+	"github.com/rexshan/tarsgo/tars/util/appzaplog"
+	"github.com/rexshan/tarsgo/tars/util/appzaplog/zap"
 	"github.com/rexshan/tarsgo/tars/util/hash"
 	"net"
 	"strconv"
@@ -118,10 +120,12 @@ func (e *EndpointManager) GetNextValidProxy() *AdapterProxy {
 			return e.GetNextValidProxy()
 		}
 	}
-	e.createProxy(*ep)
-	a := e.adapters[ep.IPPort]
+	adp,err := e.createProxy(ep.IPPort)
 	e.mlock.Unlock()
-	return a
+	if err != nil {
+		return nil
+	}
+	return adp
 }
 
 // GetNextEndpoint returns the endpoint basic information.
@@ -147,12 +151,13 @@ func (e *EndpointManager) GetAllEndpoint() []*endpoint.Endpoint {
 	}
 	return es
 }
-
+/*
 func (e *EndpointManager) createProxy(ep endpoint.Endpoint) {
 	TLOG.Debug("create adapter:", ep)
 	end := endpoint.Endpoint2tars(ep)
 	e.adapters[ep.IPPort] = NewAdapterProxy(&end,e.comm)
 }
+*/
 
 func (e *EndpointManager) GetHashProxy(hashcode string) *AdapterProxy {
 	intHashCode,err := strconv.ParseInt(hashcode,10,64)
@@ -169,9 +174,12 @@ func (e *EndpointManager) GetHashProxy(hashcode string) *AdapterProxy {
 		e.mlock.Unlock()
 		return adp
 	}
-	e.createProxy(*ep)
+	adp,err := e.createProxy(ep.IPPort)
 	e.mlock.Unlock()
-	return e.adapters[ep.IPPort]
+	if err != nil {
+		return nil
+	}
+	return adp
 }
 
 
@@ -199,7 +207,7 @@ func (e *EndpointManager)GetConsistHashProxy(hashcode string) *AdapterProxy {
 		return nil
 	}
 
-	localadapter,err = e.createProxyByIp(ipport)
+	localadapter,err = e.createProxy(ipport)
 	e.mlock.Unlock()
 	if err != nil {
 		TLOG.Warnf("GetConsistHashProxy createProxy %s %s",hashcode,ipport)
@@ -208,7 +216,7 @@ func (e *EndpointManager)GetConsistHashProxy(hashcode string) *AdapterProxy {
 	return localadapter
 }
 
-func (e *EndpointManager)createProxyByIp(ipport string)(*AdapterProxy,error) {
+func (e *EndpointManager)createProxy(ipport string)(*AdapterProxy,error) {
 	host,port,err := net.SplitHostPort(ipport)
 	if err != nil {
 		TLOG.Warnf("SplitHostPort not found %s ",ipport)
@@ -276,39 +284,29 @@ func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 	TLOG.Debug("find obj endpoint:", e.objName, ret, *activeEp, *inactiveEp)
 
 	e.mlock.Lock()
+	defer e.mlock.Unlock()
 	if (len(*inactiveEp)) > 0 {
 		for _, ep := range *inactiveEp {
 			end := endpoint.Tars2endpoint(ep)
 			e.pointsSet.Remove(end)
 			if a, ok := e.adapters[end.IPPort]; ok {
 				delete(e.adapters, end.IPPort)
+				appzaplog.Info("----------------remote ep", zap.String("endpoint", end.IPPort))
 				e.consistadapters = e.consistadapters.RemoveNode(end.IPPort)
 				a.Close()
 			}
 		}
 	}
 	if (len(*activeEp)) > 0 {
-		// clean it first,then add back .this action must lead to add lock,
-		// but if don't clean may lead to leakage.it's better to use remove.
 		e.pointsSet.Clear()
 		for _, ep := range *activeEp {
 			end := endpoint.Tars2endpoint(ep)
 			e.pointsSet.Add(end)
-			e.consistadapters = e.consistadapters.AddNode(net.JoinHostPort(ep.Host,strconv.FormatInt(int64(ep.Port),10)))
+			appzaplog.Info("----------------add ep", zap.String("endpoint", end.IPPort))
+			e.consistadapters = e.consistadapters.AddNode(end.IPPort)
 		}
 		e.index = e.pointsSet.Slice()
 	}
-	for k,end := range e.adapters {
-		// clean up dirty data
-		if !e.pointsSet.Has(end) {
-			if a, ok := e.adapters[k]; ok {
-				delete(e.adapters, k)
-				e.consistadapters = e.consistadapters.RemoveNode(k)
-				a.Close()
-			}
-		}
-	}
-	e.mlock.Unlock()
 }
 
 
