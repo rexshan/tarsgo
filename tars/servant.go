@@ -103,7 +103,7 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	if allFilters.cf != nil {
 		err = allFilters.cf(ctx, msg, s.obj.Invoke, time.Duration(s.timeout)*time.Millisecond)
 	} else {
-		err = s.obj.Invokes.hashcode(ctx, msg, time.Duration(s.timeout)*time.Millisecond)
+		err = s.obj.Invoke(ctx, msg, time.Duration(s.timeout)*time.Millisecond)
 	}
 
 	if err != nil {
