@@ -2,8 +2,6 @@ package tars
 
 import (
 	"github.com/rexshan/tarsgo/tars/sd"
-	"github.com/rexshan/tarsgo/tars/util/appzaplog"
-	"github.com/rexshan/tarsgo/tars/util/appzaplog/zap"
 	"github.com/rexshan/tarsgo/tars/util/hash"
 	"net"
 	"strconv"
@@ -151,13 +149,7 @@ func (e *EndpointManager) GetAllEndpoint() []*endpoint.Endpoint {
 	}
 	return es
 }
-/*
-func (e *EndpointManager) createProxy(ep endpoint.Endpoint) {
-	TLOG.Debug("create adapter:", ep)
-	end := endpoint.Endpoint2tars(ep)
-	e.adapters[ep.IPPort] = NewAdapterProxy(&end,e.comm)
-}
-*/
+
 
 func (e *EndpointManager) GetHashProxy(hashcode string) *AdapterProxy {
 	intHashCode,err := strconv.ParseInt(hashcode,10,64)
@@ -190,6 +182,7 @@ func (e *EndpointManager)GetConsistHashProxy(hashcode string) *AdapterProxy {
 		ok bool
 		err error
 	)
+	TLOG.Debugf("GetConsistHashProxy  %s",hashcode)
 	e.mlock.Lock()
 	ipport,ok = e.consistadapters.GetNode(hashcode)
 	if !ok {
@@ -291,7 +284,6 @@ func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 			e.pointsSet.Remove(end)
 			if a, ok := e.adapters[end.IPPort]; ok {
 				delete(e.adapters, end.IPPort)
-				appzaplog.Info("----------------remote ep", zap.String("endpoint", end.IPPort))
 				e.consistadapters = e.consistadapters.RemoveNode(end.IPPort)
 				a.Close()
 			}
@@ -302,7 +294,6 @@ func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 		for _, ep := range *activeEp {
 			end := endpoint.Tars2endpoint(ep)
 			e.pointsSet.Add(end)
-			appzaplog.Info("----------------add ep", zap.String("endpoint", end.IPPort))
 			e.consistadapters = e.consistadapters.AddNode(end.IPPort)
 		}
 		e.index = e.pointsSet.Slice()
