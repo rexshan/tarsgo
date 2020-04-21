@@ -31,7 +31,6 @@ func (n *NodeFHelper) SetNodeInfo(comm *Communicator, node string, app string, s
 
 //KeepAlive sends the keepalive pacakage to the node.
 func (n *NodeFHelper) KeepAlive(adapter string) {
-	TLOG.Infof("KeepAlive :%s",adapter)
 	n.si.Adapter = adapter
 	_, err := n.sf.KeepAlive(&n.si)
 	if err != nil {
@@ -41,7 +40,6 @@ func (n *NodeFHelper) KeepAlive(adapter string) {
 
 //ReportVersion report the tars version to the node.
 func (n *NodeFHelper) ReportVersion(version string) {
-	TLOG.Infof("ReportVersion :%s",version)
 	_, err := n.sf.ReportVersion(n.si.Application, n.si.ServerName, version)
 	if err != nil {
 		TLOG.Error("report Version fail:")

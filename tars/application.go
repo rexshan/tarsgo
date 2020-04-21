@@ -35,7 +35,7 @@ type adminFn func(string) (string, error)
 
 var (
 	adminMethods map[string]adminFn
-	ConfPath *string
+	ConfPath     *string
 )
 
 func init() {
@@ -165,9 +165,8 @@ func initConfig() {
 	}
 	tarsConfig["AdminObj"] = adminCfg
 	svrCfg.Adapters["AdminAdapter"] = adapterConfig{localpoint, "tcp", "AdminObj", 1}
-	subCfgChan = make(chan *CfgItem,10)
+	subCfgChan = make(chan *CfgItem, 10)
 }
-
 
 func initFrameWorkClient(c *Communicator) {
 	if cc := GetClientConfig(); cc != nil {
@@ -184,7 +183,7 @@ func Run() {
 	// add adminF
 	adf := new(adminf.AdminF)
 	ad := new(Admin)
-	addServantCommon(adf, ad, "AdminObj",false)
+	addServantCommon(adf, ad, "AdminObj", false)
 
 	for _, obj := range objRunList {
 		if s, ok := httpSvrs[obj]; ok {
