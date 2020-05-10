@@ -23,6 +23,6 @@ func checkPanic() {
 
 func CheckGoPanic() {
 	if r := recover(); r != nil {
-		appzaplog.Error("painc==============:",zap.String("stack",string(debug.Stack())))
+		appzaplog.DPanic("panic recovered==============:",zap.String("stack",string(debug.Stack())))
 	}
 }
