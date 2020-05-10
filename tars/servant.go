@@ -68,7 +68,7 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	buf []byte,status map[string]string,
 	reqContext map[string]string,
 	Resp *requestf.ResponsePacket) error {
-	defer checkPanic()
+	defer CheckGoPanic()
 	var reqCtxMap map[string]string
 	//TODO 重置sid，防止溢出
 	atomic.CompareAndSwapInt32(&s.sid, 1<<31-1, 1)
@@ -96,8 +96,9 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	msg := &Message{Req: &req, Ser: s, Obj: s.obj}
 	msg.Init()
 	if s.isHash {
-		TLOG.Debugf("--------------- HashCode %s",s.hashcode)
 		msg.setConsistHashCode(s.hashcode)
+	}else if key,ok := reqCtxMap[CONTEXTCONSISTHASHKEY];ok {
+		msg.setConsistHashCode(key)
 	}
 	var err error
 	if allFilters.cf != nil {

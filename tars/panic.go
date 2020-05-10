@@ -2,6 +2,8 @@ package tars
 
 import (
 	"fmt"
+	"github.com/rexshan/tarsgo/tars/util/appzaplog"
+	"github.com/rexshan/tarsgo/tars/util/appzaplog/zap"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -21,6 +23,6 @@ func checkPanic() {
 
 func CheckGoPanic() {
 	if r := recover(); r != nil {
-		TLOG.Errorf("painc :%s",string(debug.Stack()))
+		appzaplog.Error("painc==============:",zap.String("stack",string(debug.Stack())))
 	}
 }
