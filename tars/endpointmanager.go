@@ -301,12 +301,21 @@ func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 }
 
 
-func (e *EndpointManager)GetAvailableProxys() (list map[string]*AdapterProxy) {
+func (e *EndpointManager) GetAvailableProxys() (list map[string]*AdapterProxy) {
 	enlist := e.GetAllEndpoint()
 	list = make(map[string]*AdapterProxy)
-	for _,ed := range enlist {
-		if e.adapters[ed.IPPort].status {
-			list[ed.IPPort] = e.adapters[ed.IPPort]
+	for _, ed := range enlist {
+		if adp, ok := e.adapters[ed.IPPort]; ok {
+			if adp.status {
+				list[ed.IPPort] = adp
+			}
+		} else {
+			adp, err := e.createProxy(ed.IPPort)
+			if err != nil {
+				TLOG.Infof("GetAvailableProxys adapter fail %s %v", ed.IPPort, err)
+			} else {
+				list[ed.IPPort] = adp
+			}
 		}
 	}
 	return
