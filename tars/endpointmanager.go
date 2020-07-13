@@ -282,9 +282,9 @@ func (e *EndpointManager) findAndSetObj(sdhelper sd.SDHelper) {
 		for _, ep := range *inactiveEp {
 			end := endpoint.Tars2endpoint(ep)
 			e.pointsSet.Remove(end)
+			e.consistadapters = e.consistadapters.RemoveNode(end.IPPort)
 			if a, ok := e.adapters[end.IPPort]; ok {
 				delete(e.adapters, end.IPPort)
-				e.consistadapters = e.consistadapters.RemoveNode(end.IPPort)
 				a.Close()
 			}
 		}
