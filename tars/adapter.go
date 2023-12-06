@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"github.com/rexshan/tarsgo/tars/protocol/res/basef"
 	"github.com/rexshan/tarsgo/tars/util/tools"
 	"net"
 	"strconv"
@@ -19,34 +20,39 @@ import (
 
 // AdapterProxy : Adapter proxy
 type AdapterProxy struct {
-	resp       sync.Map
-	point      *endpointf.EndpointF
-	tarsClient *transport.TarsClient
-	comm       *Communicator
-	failCount  int32
-	sendCount  int32
-	status     bool
-	closed     bool
-	breaker	   tools.Breaker
+	resp              sync.Map
+	point             *endpointf.EndpointF
+	tarsClient        *transport.TarsClient
+	comm              *Communicator
+	servantProxy      *ServantProxy
+	failCount         int32
+	lastFailCount     int32
+	sendCount         int32
+	successCount      int32
+	lastSuccessTime   int64
+	status            bool
+	closed            bool
+	breaker           tools.Breaker
+	lastKeepAliveTime int64
 }
 
-func NewAdapterProxy(point *endpointf.EndpointF, comm *Communicator)*AdapterProxy {
-	strPort := strconv.FormatInt(int64(point.Port),10)
+func NewAdapterProxy(point *endpointf.EndpointF, comm *Communicator) *AdapterProxy {
+	strPort := strconv.FormatInt(int64(point.Port), 10)
 	brkGroup := tools.NewGroup(nil)
-	brk := brkGroup.Get(net.JoinHostPort(point.Host,strPort))
+	brk := brkGroup.Get(net.JoinHostPort(point.Host, strPort))
 	c := &AdapterProxy{
-		comm:comm,
-		breaker:brk,
-		point:point,
+		comm:    comm,
+		breaker: brk,
+		point:   point,
 	}
 	proto := "tcp"
 	if point.Istcp == 0 {
 		proto = "udp"
 	}
-	netThread,_ := c.comm.GetPropertyInt("netthread")
+	netThread, _ := c.comm.GetPropertyInt("netthread")
 
 	conf := &transport.TarsClientConf{
-		Proto: proto,
+		Proto:        proto,
 		NumConnect:   netThread,
 		QueueLen:     ClientQueueLen,
 		IdleTimeout:  ClientIdleTimeout,
@@ -59,30 +65,6 @@ func NewAdapterProxy(point *endpointf.EndpointF, comm *Communicator)*AdapterProx
 	return c
 }
 
-// New : Construct an adapter proxy
-/*
-func (c *AdapterProxy) New(point *endpointf.EndpointF, comm *Communicator) error {
-	c.comm = comm
-	c.point = point
-	proto := "tcp"
-	if point.Istcp == 0 {
-		proto = "udp"
-	}
-
-	conf := &transport.TarsClientConf{
-		Proto: proto,
-		//NumConnect:   netthread,
-		QueueLen:     ClientQueueLen,
-		IdleTimeout:  ClientIdleTimeout,
-		ReadTimeout:  ClientReadTimeout,
-		WriteTimeout: ClientWriteTimeout,
-	}
-	c.tarsClient = transport.NewTarsClient(fmt.Sprintf("%s:%d", point.Host, point.Port), c, conf)
-	c.status = true
-	go c.checkActive()
-	return nil
-}
-*/
 // ParsePackage : Parse packet from bytes
 func (c *AdapterProxy) ParsePackage(buff []byte) (int, int) {
 	return TarsRequest(buff)
@@ -91,8 +73,6 @@ func (c *AdapterProxy) ParsePackage(buff []byte) (int, int) {
 // Recv : Recover read channel when closed for timeout
 func (c *AdapterProxy) Recv(pkg []byte) {
 	defer func() {
-		// TODO readCh has a certain probability to be closed after the load, and we need to recover
-		// Maybe there is a better way
 		if err := recover(); err != nil {
 			TLOG.Error("recv pkg painc:", err)
 		}
@@ -128,7 +108,7 @@ func (c *AdapterProxy) Send(req *requestf.RequestPacket) error {
 	return c.tarsClient.Send(sbuf.Bytes())
 }
 
-func (c *AdapterProxy)onBreaker(err *error){
+func (c *AdapterProxy) onBreaker(err *error) {
 	if err != nil && *err != nil {
 		c.breaker.MarkFailed()
 	} else {
@@ -136,7 +116,7 @@ func (c *AdapterProxy)onBreaker(err *error){
 	}
 }
 
-func (c *AdapterProxy)Available()bool  {
+func (c *AdapterProxy) Available() bool {
 	return c.breaker.Allow() == nil
 }
 
@@ -155,32 +135,58 @@ func (c *AdapterProxy) sendAdd() {
 	atomic.AddInt32(&c.sendCount, 1)
 }
 
+func (c *AdapterProxy) successAdd() {
+	now := time.Now().Unix()
+	atomic.SwapInt64(&c.lastSuccessTime, now)
+	atomic.AddInt32(&c.successCount, 1)
+	atomic.SwapInt32(&c.lastFailCount, 0)
+}
+
 func (c *AdapterProxy) failAdd() {
+	atomic.AddInt32(&c.lastFailCount, 1)
 	atomic.AddInt32(&c.failCount, 1)
 }
 
 func (c *AdapterProxy) reset() {
+	now := time.Now().Unix()
 	atomic.SwapInt32(&c.sendCount, 0)
 	atomic.SwapInt32(&c.failCount, 0)
+	atomic.SwapInt64(&c.lastKeepAliveTime, now)
 }
 
 func (c *AdapterProxy) checkActive() {
-	loop := time.NewTicker(AdapterProxyTicker)
-	count := 0 // Detect if a dead node recovers each minute
-	for range loop.C {
+	for range time.NewTicker(AdapterProxyTicker).C {
 		if c.closed {
-			loop.Stop()
 			return
 		}
-		if c.failCount > c.sendCount/2 {
-			c.status = false
-		}
-		if !c.status && count > AdapterProxyResetCount {
-			//TODO USE TAFPING INSTEAD
-			c.reset()
-			c.status = true
-			count = 0
-		}
-		count++
+		c.doKeepAlive()
 	}
+}
+
+func (c *AdapterProxy) doKeepAlive() {
+	if c.closed {
+		return
+	}
+	now := time.Now().Unix()
+	if now-c.lastKeepAliveTime < int64(c.comm.Client.KeepAliveInterval/1000) {
+		return
+	}
+	c.lastKeepAliveTime = now
+
+	req := requestf.RequestPacket{
+		IVersion:     1,
+		CPacketType:  basef.TARSONEWAY,
+		IRequestId:   c.servantProxy.genRequestID(),
+		SServantName: c.servantProxy.name,
+		SFuncName:    "tars_ping",
+		ITimeout:     int32(c.servantProxy.timeout),
+	}
+	msg := &Message{Req: &req, Ser: c.servantProxy}
+	msg.Init()
+	msg.Adp = c
+	if err := c.Send(msg.Req); err != nil {
+		c.failAdd()
+		return
+	}
+	c.successAdd()
 }

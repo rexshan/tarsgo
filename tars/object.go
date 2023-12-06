@@ -26,13 +26,12 @@ func NewObjectProxy(comm *Communicator, objName string) *ObjectProxy {
 	}
 }
 
-
 // Invoke get proxy information
-func (obj *ObjectProxy) Invoke(ctx context.Context, msg *Message, timeout time.Duration) error {
+func (obj *ObjectProxy) Invoke(ctx context.Context, msg *Message, timeout time.Duration, s *ServantProxy) error {
 	var adp *AdapterProxy
 	if msg.Adp != nil {
 		adp = msg.Adp
-	}else {
+	} else {
 		adp = obj.manager.SelectAdapterProxy(msg)
 	}
 
@@ -49,6 +48,7 @@ func (obj *ObjectProxy) Invoke(ctx context.Context, msg *Message, timeout time.D
 	}
 
 	msg.Adp = adp
+	adp.servantProxy = s
 	atomic.AddInt32(&obj.queueLen, 1)
 	readCh := make(chan *requestf.ResponsePacket, 1)
 	adp.resp.Store(msg.Req.IRequestId, readCh)
@@ -82,8 +82,6 @@ func (obj *ObjectProxy) Invoke(ctx context.Context, msg *Message, timeout time.D
 	return nil
 }
 
-func (obj *ObjectProxy)GetAvailableProxys() map[string]*AdapterProxy{
+func (obj *ObjectProxy) GetAvailableProxys() map[string]*AdapterProxy {
 	return obj.manager.GetAvailableProxys()
 }
-
-

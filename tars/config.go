@@ -10,7 +10,7 @@ var svrCfg *serverConfig
 var cltCfg *clientConfig
 var subCfgChan chan *CfgItem
 
-type ConfigListener func(string,string)
+type ConfigListener func(string, string)
 
 type CfgItem struct {
 	FileName string
@@ -69,19 +69,20 @@ type clientConfig struct {
 	refreshEndpointInterval int
 	reportInterval          int
 	AsyncInvokeTimeout      int
+	KeepAliveInterval       int
 }
 
-func fullObjName(obj string)(string,error) {
+func fullObjName(obj string) (string, error) {
 	var fullObjName string
 	pos := strings.Index(obj, ".")
 	if pos > 0 {
-		fullObjName =  obj
+		fullObjName = obj
 	} else {
 		switch {
 		case GetServerConfig() == nil:
 			return fullObjName, errors.New("nil server config")
 		case GetServerConfig().App == "" || GetServerConfig().Server == "":
-			return fullObjName,errors.New("empty app or server name")
+			return fullObjName, errors.New("empty app or server name")
 		}
 		fullObjName = strings.Join([]string{
 			GetServerConfig().App,
@@ -89,32 +90,32 @@ func fullObjName(obj string)(string,error) {
 			obj,
 		}, ".")
 	}
-	return fullObjName,nil
+	return fullObjName, nil
 }
 
-func SubTarsConfig(listener ConfigListener,fileName ...string) {
-	go func(w ConfigListener,fl ...string) {
+func SubTarsConfig(listener ConfigListener, fileName ...string) {
+	go func(w ConfigListener, fl ...string) {
 		CheckGoPanic()
 		for {
 			select {
 			case item, ok := <-subCfgChan:
 				if ok {
-					for _,f := range fl {
+					for _, f := range fl {
 						if item.FileName == f {
-							w(f,item.Content)
+							w(f, item.Content)
 						}
 					}
 
 				}
 			}
 		}
-	}(listener,fileName...)
+	}(listener, fileName...)
 }
 
-func noticeLoadConfig(fileName string,content string){
+func noticeLoadConfig(fileName string, content string) {
 	select {
-	case subCfgChan <- &CfgItem{FileName:fileName,Content:content}:
+	case subCfgChan <- &CfgItem{FileName: fileName, Content: content}:
 	default:
-		TLOG.Warnf("not consumer config drop it :%s",fileName)
+		TLOG.Warnf("not consumer config drop it :%s", fileName)
 	}
 }

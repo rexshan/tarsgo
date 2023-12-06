@@ -15,7 +15,7 @@ type filters struct {
 var allFilters = filters{nil, nil}
 
 //Invoke is used for Invoke tars server service
-type Invoke func(ctx context.Context, msg *Message, timeout time.Duration) (err error)
+type Invoke func(ctx context.Context, msg *Message, timeout time.Duration, proxy *ServantProxy) (err error)
 
 //RegisterClientFilter  registers the Client filter , and will be executed in every request.
 func RegisterClientFilter(f ClientFilter) {
@@ -30,7 +30,7 @@ type ServerFilter func(ctx context.Context, d Dispatch, f interface{},
 	req *requestf.RequestPacket, resp *requestf.ResponsePacket, withContext bool) (err error)
 
 //ClientFilter is used for filter request & response for client, for implementing plugins like opentracing
-type ClientFilter func(ctx context.Context, msg *Message, invoke Invoke, timeout time.Duration) (err error)
+type ClientFilter func(ctx context.Context, msg *Message, invoke Invoke, timeout time.Duration, proxy *ServantProxy) (err error)
 
 //RegisterServerFilter register the server filter.
 func RegisterServerFilter(f ServerFilter) {

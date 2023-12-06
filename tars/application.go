@@ -114,7 +114,9 @@ func initConfig() {
 	cltCfg.stat = cMap["stat"]
 	cltCfg.property = cMap["property"]
 	cltCfg.AsyncInvokeTimeout = c.GetInt("/tars/application/client<async-invoke-timeout>")
-	cltCfg.refreshEndpointInterval = c.GetInt("/tars/application/client<refresh-endpoint-interval>")
+	cltCfg.AsyncInvokeTimeout = c.GetInt("/tars/application/client<async-invoke-timeout>")
+	cltCfg.refreshEndpointInterval = c.GetInt("/tars/application/client<keep-alive-interval>")
+
 	serList = c.GetDomain("/tars/application/server")
 
 	for _, adapter := range serList {

@@ -26,7 +26,8 @@ type ServantProxy struct {
 }
 
 const (
-	STATUSERRSTR = "errstring"
+	STATUSERRSTR       = "errstring"
+	maxInt32     int32 = 1<<31 - 1
 )
 
 func NewServantProxy(comm *Communicator, objName string) *ServantProxy {
@@ -41,10 +42,10 @@ func NewServantProxy(comm *Communicator, objName string) *ServantProxy {
 	}
 	if s.comm.Client.AsyncInvokeTimeout > 0 {
 		s.timeout = s.comm.Client.AsyncInvokeTimeout
-	}else {
-		s.timeout = 3000  //默认给3000的超时控制
+	} else {
+		s.timeout = 3000 //默认给3000的超时控制
 	}
-	TLOG.Info("-------------------- Servant time out set %d",s.timeout)
+	TLOG.Info("-------------------- Servant time out set %d", s.timeout)
 	s.obj = NewObjectProxy(comm, objName)
 	return s
 }
@@ -65,20 +66,20 @@ func (s *ServantProxy) TarsSetHashCode(code string) {
 //Tars_invoke is use for client inoking server.
 func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	sFuncName string,
-	buf []byte,status map[string]string,
+	buf []byte, status map[string]string,
 	reqContext map[string]string,
 	Resp *requestf.ResponsePacket) error {
 	defer CheckGoPanic()
 	var reqCtxMap map[string]string
 	//TODO 重置sid，防止溢出
-	atomic.CompareAndSwapInt32(&s.sid, 1<<31-1, 1)
+	atomic.CompareAndSwapInt32(&s.sid, maxInt32, 1)
 
 	if reqContext != nil {
 		reqCtxMap = reqContext
-	}else {
-		if v,ok := current.GetRequestContext(ctx);ok {
+	} else {
+		if v, ok := current.GetRequestContext(ctx); ok {
 			reqCtxMap = v
-		}else {
+		} else {
 			reqCtxMap = make(map[string]string)
 		}
 	}
@@ -97,18 +98,18 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	msg.Init()
 	if s.isHash {
 		msg.setConsistHashCode(s.hashcode)
-	}else if key,ok := reqCtxMap[CONTEXTCONSISTHASHKEY];ok {
+	} else if key, ok := reqCtxMap[CONTEXTCONSISTHASHKEY]; ok {
 		msg.setConsistHashCode(key)
 	}
 	var err error
 	if allFilters.cf != nil {
-		err = allFilters.cf(ctx, msg, s.obj.Invoke, time.Duration(s.timeout)*time.Millisecond)
+		err = allFilters.cf(ctx, msg, s.obj.Invoke, time.Duration(s.timeout)*time.Millisecond, s)
 	} else {
-		err = s.obj.Invoke(ctx, msg, time.Duration(s.timeout)*time.Millisecond)
+		err = s.obj.Invoke(ctx, msg, time.Duration(s.timeout)*time.Millisecond, s)
 	}
 
 	if err != nil {
-		TLOG.Errorf("Invoke Obj:%s,fun:%s,error:%s timeout: %d", s.name, sFuncName, err.Error(),s.timeout)
+		TLOG.Errorf("Invoke Obj:%s,fun:%s,error:%s timeout: %d", s.name, sFuncName, err.Error(), s.timeout)
 		if msg.Resp == nil {
 			ReportStat(msg, 0, 0, 1)
 		} else if msg.Status == basef.TARSINVOKETIMEOUT {
@@ -120,7 +121,7 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	}
 	msg.End()
 	*Resp = *msg.Resp
-	if errStr,ok := msg.Resp.Status[STATUSERRSTR];ok {
+	if errStr, ok := msg.Resp.Status[STATUSERRSTR]; ok {
 		return errors.New(errStr)
 	}
 	//report
@@ -128,9 +129,18 @@ func (s *ServantProxy) Tars_invoke(ctx context.Context, ctype byte,
 	return err
 }
 
+// 生成请求 ID
+func (s *ServantProxy) genRequestID() int32 {
+	atomic.CompareAndSwapInt32(&s.sid, maxInt32, 1)
+	for {
+		if v := atomic.AddInt32(&s.sid, 1); v != 0 {
+			return v
+		}
+	}
+}
 
-func (s *ServantProxy)GetProxyEndPoints() []string{
-	ipPorts := make([]string,0)
+func (s *ServantProxy) GetProxyEndPoints() []string {
+	ipPorts := make([]string, 0)
 	adpMap := s.obj.GetAvailableProxys()
 	for ipPort, _ := range adpMap {
 		ipPorts = append(ipPorts, ipPort)
@@ -138,14 +148,14 @@ func (s *ServantProxy)GetProxyEndPoints() []string{
 	return ipPorts
 }
 
-func (s *ServantProxy)ProxyInvoke(ctx context.Context, cType byte, sFuncName string, buf []byte, ipPort string,Resp *requestf.ResponsePacket) error {
+func (s *ServantProxy) ProxyInvoke(ctx context.Context, cType byte, sFuncName string, buf []byte, ipPort string, Resp *requestf.ResponsePacket) error {
 	if ipPort == "" {
 		return errors.New("not set ip port")
 	}
 	adpMap := s.obj.GetAvailableProxys()
 	adp := adpMap[ipPort]
 	atomic.CompareAndSwapInt32(&s.sid, 1<<31-1, 1)
-	ctxMap,ok := current.GetRequestContext(ctx)
+	ctxMap, ok := current.GetRequestContext(ctx)
 	if !ok {
 		ctxMap = make(map[string]string)
 	}
@@ -158,16 +168,16 @@ func (s *ServantProxy)ProxyInvoke(ctx context.Context, cType byte, sFuncName str
 		SBuffer:      tools.ByteToInt8(buf),
 		ITimeout:     ReqDefaultTimeout,
 		Context:      ctxMap,
-	//	Status:       status,
+		//	Status:       status,
 	}
-	msg := &Message{Req: &req, Ser: s, Obj: s.obj,Adp:adp}
+	msg := &Message{Req: &req, Ser: s, Obj: s.obj, Adp: adp}
 	msg.Init()
 
 	var err error
 	if allFilters.cf != nil {
-		err = allFilters.cf(ctx, msg, s.obj.Invoke, time.Duration(s.timeout)*time.Millisecond)
+		err = allFilters.cf(ctx, msg, s.obj.Invoke, time.Duration(s.timeout)*time.Millisecond, s)
 	} else {
-		err = s.obj.Invoke(ctx, msg, time.Duration(s.timeout)*time.Millisecond)
+		err = s.obj.Invoke(ctx, msg, time.Duration(s.timeout)*time.Millisecond, s)
 	}
 	msg.End()
 	if err != nil {
@@ -182,7 +192,7 @@ func (s *ServantProxy)ProxyInvoke(ctx context.Context, cType byte, sFuncName str
 		return err
 	}
 	*Resp = *msg.Resp
-	if errStr,ok := msg.Resp.Status[STATUSERRSTR];ok {
+	if errStr, ok := msg.Resp.Status[STATUSERRSTR]; ok {
 		return errors.New(errStr)
 	}
 	ReportStat(msg, 1, 0, 0)
@@ -199,11 +209,10 @@ type ServantProxyFactory struct {
 func NewServantProxyFactory(comm *Communicator) *ServantProxyFactory {
 	return &ServantProxyFactory{
 		comm: comm,
-		fm:new(sync.RWMutex),
+		fm:   new(sync.RWMutex),
 		objs: make(map[string]*ServantProxy),
 	}
 }
-
 
 //GetServantProxy gets the ServanrProxy for the object.
 func (o *ServantProxyFactory) GetServantProxy(objName string) *ServantProxy {
@@ -214,7 +223,7 @@ func (o *ServantProxyFactory) GetServantProxy(objName string) *ServantProxy {
 	return o.createProxy(objName)
 }
 
-func (o *ServantProxyFactory)getProxy(objName string)*ServantProxy {
+func (o *ServantProxyFactory) getProxy(objName string) *ServantProxy {
 	o.fm.RLock()
 	defer o.fm.RUnlock()
 	if obj, ok := o.objs[objName]; ok {
