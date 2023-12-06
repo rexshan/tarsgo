@@ -77,6 +77,7 @@ const (
 	reportInterval          int = 10000
 	//AsyncInvokeTimeout async invoke timeout
 	AsyncInvokeTimeout int = 3000
+	KeepAliveInterval  int = 10000
 
 	//tcp network config
 

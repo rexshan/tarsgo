@@ -13,8 +13,6 @@ type ProxyPrx interface {
 	SetServant(s.Servant)
 }
 
-
-
 // Dail returns servant proxy
 func Dail(servant string) *ServantProxy {
 	c := new(Communicator)
@@ -53,6 +51,7 @@ func (c *Communicator) init() {
 			refreshEndpointInterval,
 			reportInterval,
 			AsyncInvokeTimeout,
+			KeepAliveInterval,
 		}
 	}
 	c.SetProperty("netthread", 2)
@@ -130,5 +129,5 @@ func (c *Communicator) GetServantProxy(objName string) *ServantProxy {
 func (c *Communicator) setQueryPrx(obj string) {
 	qf := new(queryf.QueryF)
 	qf.SetServant(c.GetServantProxy(obj))
-	c.sd = sd.NewQueryFHelper(sd.NewBucketWithRate(10,10), qf)
+	c.sd = sd.NewQueryFHelper(sd.NewBucketWithRate(10, 10), qf)
 }
